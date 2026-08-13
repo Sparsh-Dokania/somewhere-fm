@@ -60,7 +60,10 @@ export const scenes = [
     desktopImage: backseatDesktop,
     mobileImage: backseatMobile,
     accent: "#D89B63",
-    playlist: defaultTracks,
+    playlist: {
+  provider: "youtube",
+  playlistId: "PLeatb7hupNV_AWUl_7ttbsKeCQh8tF5N4",
+},
   },
 
   {
@@ -72,7 +75,10 @@ export const scenes = [
     desktopImage: lastTrainDesktop,
     mobileImage: lastTrainMobile,
     accent: "#C6A56B",
-    playlist: defaultTracks,
+    playlist: {
+  provider: "youtube",
+  playlistId: "YOUR_LAST_TRAIN_PLAYLIST_ID",
+},
   },
 
   {
@@ -84,7 +90,10 @@ export const scenes = [
     desktopImage: rainyAutoDesktop,
     mobileImage: rainyAutoMobile,
     accent: "#B9C7A4",
-    playlist: defaultTracks,
+    playlist: {
+  provider: "youtube",
+  playlistId: "YOUR_RAINY_AUTO_PLAYLIST_ID",
+},
   },
 
   {
@@ -96,7 +105,10 @@ export const scenes = [
     desktopImage: chaiDesktop,
     mobileImage: chaiMobile,
     accent: "#D6A85F",
-    playlist: defaultTracks,
+    playlist: {
+  provider: "youtube",
+  playlistId: "YOUR_CHAI_PLAYLIST_ID",
+},
   },
 
   {
@@ -108,7 +120,10 @@ export const scenes = [
     desktopImage: truckDesktop,
     mobileImage: truckMobile,
     accent: "#D58B4A",
-    playlist: defaultTracks,
+    playlist: {
+  provider: "youtube",
+  playlistId: "YOUR_TRUCK_DRIVER_RADIO_PLAYLIST_ID",
+},
   },
 
   {
@@ -120,7 +135,10 @@ export const scenes = [
     desktopImage: salonDesktop,
     mobileImage: salonMobile,
     accent: "#B57B63",
-    playlist: defaultTracks,
+    playlist: {
+  provider: "youtube",
+  playlistId: "YOUR_SALON_2007_PLAYLIST_ID",
+},
   },
 
   {
@@ -132,7 +150,10 @@ export const scenes = [
     desktopImage: room207Desktop,
     mobileImage: room207Mobile,
     accent: "#C69B6B",
-    playlist: defaultTracks,
+    playlist: {
+  provider: "youtube",
+  playlistId: "YOUR_ROOM_207_PLAYLIST_ID",
+},
   },
 
   {
@@ -144,7 +165,10 @@ export const scenes = [
     desktopImage: twoSeventeenDesktop,
     mobileImage: twoSeventeenMobile,
     accent: "#8A9DB5",
-    playlist: defaultTracks,
+    playlist: {
+  provider: "youtube",
+  playlistId: "YOUR_TWO_SEVENTEEN_PLAYLIST_ID",
+},
   },
 
   {
@@ -156,7 +180,10 @@ export const scenes = [
     desktopImage: lastDeliveryDesktop,
     mobileImage: lastDeliveryMobile,
     accent: "#C47D54",
-    playlist: defaultTracks,
+    playlist: {
+  provider: "youtube",
+  playlistId: "YOUR_LAST_DELIVERY_PLAYLIST_ID",
+},
   },
 
   {
@@ -168,6 +195,9 @@ export const scenes = [
     desktopImage: somewhereElseDesktop,
     mobileImage: somewhereElseMobile,
     accent: "#A66A69",
-    playlist: defaultTracks,
+    playlist: {
+  provider: "youtube",
+  playlistId: "YOUR_SOMETHING_ELSE_PLAYLIST_ID",
+},
   },
 ];
