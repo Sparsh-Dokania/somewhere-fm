@@ -17,13 +17,15 @@ function Experience({
   const backgroundRef = useRef(null);
   const contentRef = useRef(null);
   const youtubePlayer = useRef(null);
-  const transitionRef = useRef(false);
 
-  const [youtubeReady, setYoutubeReady] = useState(false);
+  const [youtubeReady, setYoutubeReady] =
+    useState(false);
+
+  const transitionRef = useRef(false);
 
   /*
    * ----------------------------------------
-   * SCENE TRANSITION
+   * SEAMLESS SCENE TRANSITION
    * ----------------------------------------
    */
 
@@ -43,56 +45,67 @@ function Experience({
       },
     });
 
+    /*
+     * The whole scene doesn't disappear.
+     *
+     * We slightly:
+     * - scale
+     * - blur
+     * - shift
+     *
+     * Then change the scene underneath.
+     */
+
     tl.to(
-      contentRef.current,
+      backgroundRef.current,
       {
-        opacity: 0,
-        y: 12,
-        duration: 0.3,
-        ease: "power2.in",
+        scale: 1.035,
+        filter: "blur(5px)",
+        duration: 0.28,
+        ease: "power2.inOut",
       },
       0
     );
 
     tl.to(
-      backgroundRef.current,
+      contentRef.current,
       {
-        scale: 1.05,
-        opacity: 0,
-        duration: 0.45,
-        ease: "power2.in",
+        y: -4,
+        opacity: 0.78,
+        duration: 0.2,
+        ease: "power2.inOut",
       },
       0
     );
+
+    /*
+     * CHANGE SCENE
+     */
 
     tl.call(() => {
       onChangeScene(nextIndex);
     });
 
-    tl.fromTo(
+    /*
+     * NEW SCENE SETTLES
+     */
+
+    tl.to(
       backgroundRef.current,
       {
-        scale: 1.05,
-        opacity: 0,
-      },
-      {
         scale: 1,
-        opacity: 1,
-        duration: 0.8,
+        filter: "blur(0px)",
+        duration: 0.65,
         ease: "power3.out",
       }
     );
 
-    tl.fromTo(
+    tl.to(
       contentRef.current,
       {
-        opacity: 0,
-        y: -8,
-      },
-      {
-        opacity: 1,
         y: 0,
-        duration: 0.55,
+        opacity: 1,
+        duration: 0.45,
         ease: "power3.out",
       },
       "-=0.5"
@@ -125,13 +138,12 @@ function Experience({
 
   /*
    * ----------------------------------------
-   * KEYBOARD NAVIGATION
+   * KEYBOARD
    * ----------------------------------------
    */
 
   useEffect(() => {
     const handleKeyDown = (event) => {
-      // Don't change scenes while typing
       if (
         event.target instanceof HTMLInputElement ||
         event.target instanceof HTMLTextAreaElement
@@ -169,7 +181,7 @@ function Experience({
 
   /*
    * ----------------------------------------
-   * LOAD PLAYLIST WHEN SCENE CHANGES
+   * LOAD SCENE PLAYLIST
    * ----------------------------------------
    */
 
@@ -204,30 +216,13 @@ function Experience({
    */
 
   const handleYouTubeReady = (event) => {
-    const player = event?.target;
-
-    if (player) {
-      youtubePlayer.current = player;
+    if (event?.target) {
+      youtubePlayer.current =
+        event.target;
     }
 
     setYoutubeReady(true);
   };
-
-  /*
-   * ----------------------------------------
-   * YOUTUBE STATE
-   * ----------------------------------------
-   */
-
-  const handleYouTubeStateChange = () => {
-    // Player.jsx reads the actual YouTube state.
-  };
-
-  /*
-   * ----------------------------------------
-   * RENDER
-   * ----------------------------------------
-   */
 
   return (
     <section
@@ -241,9 +236,7 @@ function Experience({
       "
     >
 
-      {/* =====================================
-          BACKGROUND
-      ===================================== */}
+      {/* BACKGROUND */}
 
       <div
         ref={backgroundRef}
@@ -273,17 +266,14 @@ function Experience({
         </picture>
       </div>
 
-
-      {/* =====================================
-          ATMOSPHERE
-      ===================================== */}
+      {/* ATMOSPHERE */}
 
       <div
         className="
           pointer-events-none
           absolute
           inset-0
-          bg-black/20
+          bg-black/15
         "
       />
 
@@ -293,14 +283,11 @@ function Experience({
           absolute
           inset-0
           z-10
-          bg-[radial-gradient(circle_at_center,transparent_35%,rgba(0,0,0,0.45)_100%)]
+          bg-[radial-gradient(circle_at_50%_45%,transparent_25%,rgba(0,0,0,0.42)_100%)]
         "
       />
 
-
-      {/* =====================================
-          CONTENT
-      ===================================== */}
+      {/* CONTENT */}
 
       <div
         ref={contentRef}
@@ -309,9 +296,9 @@ function Experience({
           z-20
           h-full
           w-full
+          will-change-transform
         "
       >
-
         <SceneInfo scene={scene} />
 
         <Player
@@ -326,13 +313,9 @@ function Experience({
           onPrevious={previousScene}
           onNext={nextScene}
         />
-
       </div>
 
-
-      {/* =====================================
-          BRAND
-      ===================================== */}
+      {/* BRAND */}
 
       <div
         className="
@@ -357,10 +340,7 @@ function Experience({
         </p>
       </div>
 
-
-      {/* =====================================
-          HIDDEN YOUTUBE ENGINE
-      ===================================== */}
+      {/* YOUTUBE */}
 
       <YouTubeEngine
         playlistId={
@@ -368,9 +348,6 @@ function Experience({
         }
         playerRef={youtubePlayer}
         onReady={handleYouTubeReady}
-        onStateChange={
-          handleYouTubeStateChange
-        }
       />
 
     </section>

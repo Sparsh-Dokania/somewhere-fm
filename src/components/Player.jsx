@@ -1,24 +1,16 @@
 // src/components/Player.jsx
 
-import {
-  Pause,
-  Play,
-  SkipBack,
-  SkipForward,
-} from "lucide-react";
+import { Pause, Play, SkipBack, SkipForward } from "lucide-react";
 
 import { useEffect, useRef, useState } from "react";
 import gsap from "gsap";
 import LiquidGlass from "./LiquidGlass";
 
-function Player({
-  scene,
-  youtubePlayer,
-  youtubeReady,
-}) {
+function Player({ scene, youtubePlayer, youtubeReady }) {
   const [playing, setPlaying] = useState(false);
   const [progress, setProgress] = useState(0);
   const [duration, setDuration] = useState(0);
+  const [thumbnail, setThumbnail] = useState(null);
 
   const [track, setTrack] = useState({
     title: "SOMEWHERE.FM",
@@ -104,10 +96,7 @@ function Player({
           setPlaying(true);
         }
 
-        if (
-          state === YT.PlayerState.PAUSED ||
-          state === YT.PlayerState.ENDED
-        ) {
+        if (state === YT.PlayerState.PAUSED || state === YT.PlayerState.ENDED) {
           setPlaying(false);
         }
       }
@@ -123,6 +112,7 @@ function Player({
           title: data.title || "Somewhere",
           artist: data.author || "SOMEWHERE.FM",
         });
+        setThumbnail(`https://i.ytimg.com/vi/${data.video_id}/hqdefault.jpg`);
       }
 
       /*
@@ -142,27 +132,18 @@ function Player({
       const current = player.getCurrentTime?.() || 0;
 
       if (total > 0) {
-        setProgress(
-          Math.min(100, (current / total) * 100)
-        );
+        setProgress(Math.min(100, (current / total) * 100));
       }
     };
 
     updatePlayer();
 
-    const interval = setInterval(
-      updatePlayer,
-      250
-    );
+    const interval = setInterval(updatePlayer, 250);
 
     return () => {
       clearInterval(interval);
     };
-  }, [
-    youtubeReady,
-    scene.id,
-    youtubePlayer,
-  ]);
+  }, [youtubeReady, scene.id, youtubePlayer]);
 
   /*
    * ----------------------------------------
@@ -177,9 +158,7 @@ function Player({
 
     const state = player.getPlayerState?.();
 
-    if (
-      state === window.YT?.PlayerState?.PLAYING
-    ) {
+    if (state === window.YT?.PlayerState?.PLAYING) {
       player.pauseVideo();
     } else {
       player.playVideo();
@@ -200,19 +179,14 @@ function Player({
     const playlist = player.getPlaylist?.();
 
     if (!playlist || playlist.length === 0) {
-      console.warn(
-        "YouTube playlist is not ready yet."
-      );
+      console.warn("YouTube playlist is not ready yet.");
       return;
     }
 
-    const currentIndex =
-      player.getPlaylistIndex?.() ?? 0;
+    const currentIndex = player.getPlaylistIndex?.() ?? 0;
 
     const nextIndex =
-      currentIndex + 1 >= playlist.length
-        ? 0
-        : currentIndex + 1;
+      currentIndex + 1 >= playlist.length ? 0 : currentIndex + 1;
 
     setProgress(0);
 
@@ -233,19 +207,14 @@ function Player({
     const playlist = player.getPlaylist?.();
 
     if (!playlist || playlist.length === 0) {
-      console.warn(
-        "YouTube playlist is not ready yet."
-      );
+      console.warn("YouTube playlist is not ready yet.");
       return;
     }
 
-    const currentIndex =
-      player.getPlaylistIndex?.() ?? 0;
+    const currentIndex = player.getPlaylistIndex?.() ?? 0;
 
     const previousIndex =
-      currentIndex - 1 < 0
-        ? playlist.length - 1
-        : currentIndex - 1;
+      currentIndex - 1 < 0 ? playlist.length - 1 : currentIndex - 1;
 
     setProgress(0);
 
@@ -259,29 +228,18 @@ function Player({
    */
 
   const formatTime = (seconds) => {
-    if (
-      !seconds ||
-      Number.isNaN(seconds) ||
-      !Number.isFinite(seconds)
-    ) {
+    if (!seconds || Number.isNaN(seconds) || !Number.isFinite(seconds)) {
       return "0:00";
     }
 
     const mins = Math.floor(seconds / 60);
 
-    const secs = Math.floor(
-      seconds % 60
-    );
+    const secs = Math.floor(seconds % 60);
 
-    return `${mins}:${secs
-      .toString()
-      .padStart(2, "0")}`;
+    return `${mins}:${secs.toString().padStart(2, "0")}`;
   };
 
-  const currentSeconds =
-    duration > 0
-      ? (duration * progress) / 100
-      : 0;
+  const currentSeconds = duration > 0 ? (duration * progress) / 100 : 0;
 
   /*
    * ----------------------------------------
@@ -297,120 +255,123 @@ function Player({
         left-1/2
         z-40
         w-[calc(100%-32px)]
-        max-w-[600px]
+        max-w-[560px]
         -translate-x-1/2
         md:bottom-9
       "
     >
       <LiquidGlass
         className="
-          min-h-[96px]
-          rounded-[28px]
+          min-h-[88px]
+          rounded-[26px]
           px-4
-          py-4
-          md:px-5
+          py-3
+         md:px-5
+    md:py-3.5
         "
       >
         <div className="flex items-center gap-4">
-
           {/* =================================
               CD
           ================================= */}
 
           <div
+            ref={cdRef}
             className="
-              relative
-              -ml-2
-              shrink-0
-              md:-ml-3
-            "
+    relative
+    h-[68px]
+    w-[68px]
+    shrink-0
+    overflow-hidden
+    rounded-full
+    border
+    border-white/20
+    shadow-2xl
+  "
+            style={{
+              backgroundColor: "#151515",
+            }}
           >
+            {thumbnail && (
+              <img
+                src={thumbnail}
+                alt=""
+                className="
+        absolute
+        inset-0
+        h-full
+        w-full
+        object-cover
+      "
+              />
+            )}
+
+            {/* CD tint */}
             <div
-              ref={cdRef}
               className="
-                relative
-                h-[68px]
-                w-[68px]
-                rounded-full
-                shadow-2xl
-              "
+      pointer-events-none
+      absolute
+      inset-0
+      rounded-full
+      bg-black/10
+    "
+            />
+
+            {/* reflective sweep */}
+            <div
+              className="
+      pointer-events-none
+      absolute
+      inset-0
+      rounded-full
+      opacity-30
+    "
               style={{
                 background: `
-                  radial-gradient(
-                    circle at center,
-                    #111 0 7%,
-                    #d9d9d9 8% 10%,
-                    #252525 11% 20%,
-                    #bdbdbd 21% 22%,
-                    #333 23% 42%,
-                    #d0d0d0 43% 44%,
-                    #242424 45% 65%,
-                    #aaa 66% 67%,
-                    #171717 68% 100%
-                  )
-                `,
+        linear-gradient(
+          135deg,
+          transparent 30%,
+          rgba(255,255,255,.8) 50%,
+          transparent 70%
+        )
+      `,
               }}
-            >
+            />
 
-              {/* CD SHINE */}
+            {/* center label */}
+            <div
+              className="
+      absolute
+      left-1/2
+      top-1/2
+      h-5
+      w-5
+      -translate-x-1/2
+      -translate-y-1/2
+      rounded-full
+      border
+      border-white/30
+    "
+              style={{
+                backgroundColor: scene.accent,
+              }}
+            />
 
-              <div
-                className="
-                  absolute
-                  inset-[7px]
-                  rounded-full
-                  opacity-30
-                "
-                style={{
-                  background: `
-                    linear-gradient(
-                      135deg,
-                      transparent 35%,
-                      rgba(255,255,255,.7) 50%,
-                      transparent 65%
-                    )
-                  `,
-                }}
-              />
-
-              {/* CENTER LABEL */}
-
-              <div
-                className="
-                  absolute
-                  left-1/2
-                  top-1/2
-                  h-5
-                  w-5
-                  -translate-x-1/2
-                  -translate-y-1/2
-                  rounded-full
-                "
-                style={{
-                  backgroundColor:
-                    scene.accent,
-                }}
-              />
-
-              {/* CENTER HOLE */}
-
-              <div
-                className="
-                  absolute
-                  left-1/2
-                  top-1/2
-                  h-1.5
-                  w-1.5
-                  -translate-x-1/2
-                  -translate-y-1/2
-                  rounded-full
-                  bg-black
-                "
-              />
-
-            </div>
+            {/* spindle */}
+            <div
+              className="
+      absolute
+      left-1/2
+      top-1/2
+      h-1.5
+      w-1.5
+      -translate-x-1/2
+      -translate-y-1/2
+      rounded-full
+      bg-black
+    "
+            />
           </div>
-
           {/* =================================
               TRACK INFORMATION
           ================================= */}
@@ -421,6 +382,23 @@ function Player({
               flex-1
             "
           >
+            <div className="mb-1 flex items-center gap-1.5">
+              <span
+                className={`
+      h-1.5
+      w-1.5
+      rounded-full
+      ${playing ? "animate-pulse" : ""}
+    `}
+                style={{
+                  backgroundColor: scene.accent,
+                }}
+              />
+
+              <span className="font-mono text-[7px] uppercase tracking-[0.2em] text-white/35">
+                {playing ? "Playing" : "Paused"}
+              </span>
+            </div>
             <p
               className="
                 truncate
@@ -471,10 +449,8 @@ function Player({
                   "
                   style={{
                     width: `${progress}%`,
-                    backgroundColor:
-                      scene.accent,
-                    boxShadow:
-                      `0 0 8px ${scene.accent}`,
+                    backgroundColor: scene.accent,
+                    boxShadow: `0 0 8px ${scene.accent}`,
                   }}
                 />
               </div>
@@ -504,7 +480,6 @@ function Player({
               gap-1
             "
           >
-
             {/* PREVIOUS */}
 
             <button
@@ -537,11 +512,7 @@ function Player({
               type="button"
               onClick={togglePlay}
               disabled={!youtubeReady}
-              aria-label={
-                playing
-                  ? "Pause"
-                  : "Play"
-              }
+              aria-label={playing ? "Pause" : "Play"}
               className="
                 flex
                 h-11
@@ -561,15 +532,9 @@ function Player({
               "
             >
               {playing ? (
-                <Pause
-                  size={15}
-                  fill="currentColor"
-                />
+                <Pause size={15} fill="currentColor" />
               ) : (
-                <Play
-                  size={15}
-                  fill="currentColor"
-                />
+                <Play size={15} fill="currentColor" />
               )}
             </button>
 
@@ -581,7 +546,7 @@ function Player({
               disabled={!youtubeReady}
               aria-label="Next track"
               className="
-                hidden
+                
                 h-8
                 w-8
                 items-center
@@ -593,12 +558,11 @@ function Player({
                 hover:text-white
                 disabled:cursor-not-allowed
                 disabled:opacity-30
-                sm:flex
+                flex
               "
             >
               <SkipForward size={14} />
             </button>
-
           </div>
         </div>
       </LiquidGlass>

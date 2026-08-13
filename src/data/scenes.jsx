@@ -31,173 +31,173 @@ import somewhereElseDesktop from "../assets/images/desktop/somewhere-else.png";
 import somewhereElseMobile from "../assets/images/mobile/somewhere-else.png";
 
 
-const defaultTracks = [
-  {
-    title: "Something About Tonight",
-    artist: "SOMEWHERE.FM",
-    duration: 248,
-  },
-  {
-    title: "City Lights",
-    artist: "SOMEWHERE.FM",
-    duration: 221,
-  },
-  {
-    title: "After Midnight",
-    artist: "SOMEWHERE.FM",
-    duration: 267,
-  },
-];
-
-
 export const scenes = [
   {
     id: "backseat",
-    title: "Backseat Radio",
-    time: "11:47 PM",
-    location: "Delhi",
-    description: "Long day?",
+    title: "बैकसीट रेडियो",
+    location: "दिल्ली",
+    description: "लंबा दिन था?",
     desktopImage: backseatDesktop,
     mobileImage: backseatMobile,
     accent: "#D89B63",
+
     playlist: {
-  provider: "youtube",
-  playlistId: "PLeatb7hupNV_AWUl_7ttbsKeCQh8tF5N4",
-},
+      provider: "youtube",
+      playlistId:
+        "PLeatb7hupNV_AWUl_7ttbsKeCQh8tF5N4",
+    },
   },
 
   {
     id: "last-train",
-    title: "Last Train",
-    time: "12:18 AM",
-    location: "Platform 4",
-    description: "Last one home.",
+    title: "आख़िरी ट्रेन",
+    location: "प्लेटफ़ॉर्म ४",
+    description: "आज की आख़िरी सवारी।",
     desktopImage: lastTrainDesktop,
     mobileImage: lastTrainMobile,
     accent: "#C6A56B",
+
     playlist: {
-  provider: "youtube",
-  playlistId: "YOUR_LAST_TRAIN_PLAYLIST_ID",
-},
+      provider: "youtube",
+      playlistId:
+        "OLAK5uy_kjlEqEEYEY6_yRfbCKF34GwPmjOaHzbOw",
+    },
   },
 
   {
     id: "rainy-auto",
-    title: "Rainy Auto",
-    time: "08:32 PM",
-    location: "Somewhere in NCR",
-    description: "Let it rain.",
+    title: "बारिश वाला ऑटो",
+    location: "कहीं एनसीआर में",
+    description: "बारिश को अपना काम करने दो।",
     desktopImage: rainyAutoDesktop,
     mobileImage: rainyAutoMobile,
     accent: "#B9C7A4",
+
     playlist: {
-  provider: "youtube",
-  playlistId: "YOUR_RAINY_AUTO_PLAYLIST_ID",
-},
+      provider: "youtube",
+      playlistId:
+        "OLAK5uy_n-GQb1476QnhCAOQuJTL7vxu0aoZZoZu4",
+    },
   },
 
   {
     id: "chai",
-    title: "6:43 AM Chai",
-    time: "06:43 AM",
-    location: "The city waking up",
-    description: "Before the noise.",
+    title: "सुबह ६:४३ की चाय",
+    location: "शहर जाग रहा है",
+    description: "शोर शुरू होने से पहले।",
     desktopImage: chaiDesktop,
     mobileImage: chaiMobile,
     accent: "#D6A85F",
+
     playlist: {
-  provider: "youtube",
-  playlistId: "YOUR_CHAI_PLAYLIST_ID",
-},
+      provider: "youtube",
+      playlistId:
+        "PL7KYHPKrfi5wJtnGJaIK3RvCOwDlB8C6X",
+    },
   },
 
   {
     id: "truck",
-    title: "Truck Driver Radio",
-    time: "02:04 AM",
-    location: "NH 44",
-    description: "Horn OK Please.",
+    title: "ट्रक ड्राइवर रेडियो",
+    location: "एनएच ४४",
+    description: "रास्ते लंबे हैं। रातें उससे भी लंबी।",
     desktopImage: truckDesktop,
     mobileImage: truckMobile,
     accent: "#D58B4A",
+
     playlist: {
-  provider: "youtube",
-  playlistId: "YOUR_TRUCK_DRIVER_RADIO_PLAYLIST_ID",
-},
+      provider: "youtube",
+      playlistId:
+        "PLeatb7hupNV_AWUl_7ttbsKeCQh8tF5N4",
+    },
+
+    quotes: [
+      "हॉर्न ओके प्लीज़",
+      "बुरी नज़र वाले तेरा मुँह काला",
+      "मालिक की गाड़ी, ड्राइवर का पसीना",
+      "धीरे चल प्यारे, ज़िंदगी अनमोल है",
+      "लटक मत बेटा, पटक देगा",
+      "दम है तो क्रॉस कर, नहीं तो बर्दाश्त कर",
+    ],
   },
 
   {
     id: "salon",
-    title: "Salon 2007",
-    time: "05:16 PM",
-    location: "Some neighbourhood",
-    description: "Your turn next.",
+    title: "सैलून २००७",
+    location: "किसी मोहल्ले में",
+    description: "आपका नंबर अगला है।",
     desktopImage: salonDesktop,
     mobileImage: salonMobile,
     accent: "#B57B63",
+
     playlist: {
-  provider: "youtube",
-  playlistId: "YOUR_SALON_2007_PLAYLIST_ID",
-},
+      provider: "youtube",
+      playlistId:
+        "PLq-bT4s33RYADNkcClDkLPovaKJx0HTDM",
+    },
   },
 
   {
     id: "room-207",
-    title: "Room 207",
-    time: "11:06 PM",
-    location: "Check-in",
-    description: "Nobody knows you're here.",
+    title: "कमरा २०७",
+    location: "चेक-इन",
+    description: "किसी को पता नहीं तुम यहाँ हो।",
     desktopImage: room207Desktop,
     mobileImage: room207Mobile,
     accent: "#C69B6B",
+
     playlist: {
-  provider: "youtube",
-  playlistId: "YOUR_ROOM_207_PLAYLIST_ID",
-},
+      provider: "youtube",
+      playlistId:
+        "RDCLAK5uy_kWKAcJROkxDk9mOVmfDSv9cycK_-Ci2yA",
+    },
   },
 
   {
     id: "two-seventeen",
-    title: "2:17 AM",
-    time: "02:17 AM",
-    location: "Still awake",
-    description: "You should probably sleep.",
+    title: "रात २:१७",
+    location: "अभी भी जाग रहे हो",
+    description: "सो जाना चाहिए था।",
     desktopImage: twoSeventeenDesktop,
     mobileImage: twoSeventeenMobile,
     accent: "#8A9DB5",
+
     playlist: {
-  provider: "youtube",
-  playlistId: "YOUR_TWO_SEVENTEEN_PLAYLIST_ID",
-},
+      provider: "youtube",
+      playlistId:
+        "PLjlt1WnHboa6pohWVH3UJRMU2qrSD6MwX",
+    },
   },
 
   {
     id: "last-delivery",
-    title: "Last Delivery",
-    time: "11:32 PM",
-    location: "Sector 18",
-    description: "One more and we're done.",
+    title: "आख़िरी डिलीवरी",
+    location: "सेक्टर १८",
+    description: "बस एक और। फिर घर।",
     desktopImage: lastDeliveryDesktop,
     mobileImage: lastDeliveryMobile,
     accent: "#C47D54",
+
     playlist: {
-  provider: "youtube",
-  playlistId: "YOUR_LAST_DELIVERY_PLAYLIST_ID",
-},
+      provider: "youtube",
+      playlistId:
+        "RDCLAK5uy_mxqgyPRK9n6mflkAhpQAXpebl2Y9E4atM",
+    },
   },
 
   {
     id: "somewhere-else",
-    title: "Somewhere Else",
-    time: "03:03 AM",
-    location: "Unknown",
-    description: "You weren't supposed to find this.",
+    title: "कहीं और",
+    location: "अज्ञात",
+    description: "तुम्हें यह जगह नहीं मिलनी चाहिए थी।",
     desktopImage: somewhereElseDesktop,
     mobileImage: somewhereElseMobile,
     accent: "#A66A69",
+
     playlist: {
-  provider: "youtube",
-  playlistId: "YOUR_SOMETHING_ELSE_PLAYLIST_ID",
-},
+      provider: "youtube",
+      playlistId:
+        "OLAK5uy_nkHY6d0_mX01SIifTVliGsIjdVWGcX6Pw",
+    },
   },
 ];
