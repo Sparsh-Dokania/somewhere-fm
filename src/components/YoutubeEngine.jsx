@@ -1,3 +1,5 @@
+// src/components/YouTubeEngine.jsx
+
 import { useEffect, useRef } from "react";
 
 let youtubePromise = null;
@@ -12,15 +14,21 @@ function loadYouTubeAPI() {
   }
 
   youtubePromise = new Promise((resolve) => {
-    const previousCallback = window.onYouTubeIframeAPIReady;
+    const previousCallback =
+      window.onYouTubeIframeAPIReady;
 
     window.onYouTubeIframeAPIReady = () => {
       previousCallback?.();
+
       resolve(window.YT);
     };
 
-    const script = document.createElement("script");
-    script.src = "https://www.youtube.com/iframe_api";
+    const script =
+      document.createElement("script");
+
+    script.src =
+      "https://www.youtube.com/iframe_api";
+
     script.async = true;
 
     document.head.appendChild(script);
@@ -36,60 +44,89 @@ function YouTubeEngine({
   onStateChange,
 }) {
   const containerRef = useRef(null);
+  const initializedRef = useRef(false);
+
+  /*
+   * Create YouTube player ONCE
+   */
 
   useEffect(() => {
     let cancelled = false;
 
-    async function initialize() {
+    const initialize = async () => {
       const YT = await loadYouTubeAPI();
 
-      if (cancelled || !containerRef.current) return;
+      if (
+        cancelled ||
+        !containerRef.current ||
+        initializedRef.current
+      ) {
+        return;
+      }
 
-      playerRef.current = new YT.Player(containerRef.current, {
-        width: "200",
-        height: "200",
+      initializedRef.current = true;
 
-        playerVars: {
-          autoplay: 0,
-          controls: 0,
-          disablekb: 1,
-          fs: 0,
-          playsinline: 1,
-          rel: 0,
-        },
+      const player = new YT.Player(
+        containerRef.current,
+        {
+          width: "200",
+          height: "200",
 
-        events: {
-          onReady,
-          onStateChange,
-        },
-      });
-    }
+          playerVars: {
+            autoplay: 0,
+            controls: 0,
+            disablekb: 1,
+            fs: 0,
+            playsinline: 1,
+            rel: 0,
+          },
+
+          events: {
+            onReady: (event) => {
+              playerRef.current =
+                event.target;
+
+              onReady?.(event);
+            },
+
+            onStateChange: (event) => {
+              onStateChange?.(event);
+            },
+          },
+        }
+      );
+    };
 
     initialize();
 
     return () => {
       cancelled = true;
-
-      if (playerRef.current?.destroy) {
-        playerRef.current.destroy();
-      }
-
-      playerRef.current = null;
     };
   }, []);
+
+  /*
+   * Load new playlist when scene changes
+   */
 
   useEffect(() => {
     const player = playerRef.current;
 
-    if (!player || !playlistId) return;
-
-    if (typeof player.loadPlaylist === "function") {
-      player.loadPlaylist({
-        listType: "playlist",
-        list: playlistId,
-        index: 0,
-      });
+    if (
+      !player ||
+      !playlistId ||
+      typeof player.loadPlaylist !==
+        "function"
+    ) {
+      return;
     }
+
+    player.loadPlaylist({
+      listType: "playlist",
+      list: playlistId,
+      index: 0,
+    });
+
+    player.pauseVideo();
   }, [playlistId]);
 
   return (

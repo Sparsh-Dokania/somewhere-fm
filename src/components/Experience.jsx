@@ -1,3 +1,5 @@
+// src/components/Experience.jsx
+
 import { useEffect, useRef, useState } from "react";
 import gsap from "gsap";
 
@@ -15,10 +17,15 @@ function Experience({
   const backgroundRef = useRef(null);
   const contentRef = useRef(null);
   const youtubePlayer = useRef(null);
+  const transitionRef = useRef(false);
 
   const [youtubeReady, setYoutubeReady] = useState(false);
 
-  const transitionRef = useRef(false);
+  /*
+   * ----------------------------------------
+   * SCENE TRANSITION
+   * ----------------------------------------
+   */
 
   const changeScene = (nextIndex) => {
     if (
@@ -92,6 +99,12 @@ function Experience({
     );
   };
 
+  /*
+   * ----------------------------------------
+   * SCENE NAVIGATION
+   * ----------------------------------------
+   */
+
   const previousScene = () => {
     const index =
       sceneIndex === 0
@@ -111,11 +124,21 @@ function Experience({
   };
 
   /*
-   * Keyboard navigation
+   * ----------------------------------------
+   * KEYBOARD NAVIGATION
+   * ----------------------------------------
    */
 
   useEffect(() => {
     const handleKeyDown = (event) => {
+      // Don't change scenes while typing
+      if (
+        event.target instanceof HTMLInputElement ||
+        event.target instanceof HTMLTextAreaElement
+      ) {
+        return;
+      }
+
       if (
         event.key === "ArrowRight" ||
         event.key === "ArrowDown"
@@ -145,7 +168,9 @@ function Experience({
   });
 
   /*
-   * Load scene playlist into YouTube
+   * ----------------------------------------
+   * LOAD PLAYLIST WHEN SCENE CHANGES
+   * ----------------------------------------
    */
 
   useEffect(() => {
@@ -173,29 +198,60 @@ function Experience({
   ]);
 
   /*
-   * YouTube state changes
+   * ----------------------------------------
+   * YOUTUBE READY
+   * ----------------------------------------
    */
 
-  const handleYouTubeStateChange = (event) => {
-    const YT = window.YT;
+  const handleYouTubeReady = (event) => {
+    const player = event?.target;
 
-    if (!YT) return;
-
-    if (
-      event.data === YT.PlayerState.PLAYING
-    ) {
-      // Player component reads actual state
+    if (player) {
+      youtubePlayer.current = player;
     }
+
+    setYoutubeReady(true);
   };
 
-  return (
-    <section className="relative h-full w-full overflow-hidden bg-black text-white">
+  /*
+   * ----------------------------------------
+   * YOUTUBE STATE
+   * ----------------------------------------
+   */
 
-      {/* BACKGROUND */}
+  const handleYouTubeStateChange = () => {
+    // Player.jsx reads the actual YouTube state.
+  };
+
+  /*
+   * ----------------------------------------
+   * RENDER
+   * ----------------------------------------
+   */
+
+  return (
+    <section
+      className="
+        relative
+        h-full
+        w-full
+        overflow-hidden
+        bg-black
+        text-white
+      "
+    >
+
+      {/* =====================================
+          BACKGROUND
+      ===================================== */}
 
       <div
         ref={backgroundRef}
-        className="absolute inset-0 will-change-transform"
+        className="
+          absolute
+          inset-0
+          will-change-transform
+        "
       >
         <picture>
 
@@ -207,16 +263,29 @@ function Experience({
           <img
             src={scene.desktopImage}
             alt=""
-            className="h-full w-full object-cover"
+            className="
+              h-full
+              w-full
+              object-cover
+            "
           />
 
         </picture>
       </div>
 
 
-      {/* ATMOSPHERE */}
+      {/* =====================================
+          ATMOSPHERE
+      ===================================== */}
 
-      <div className="pointer-events-none absolute inset-0 bg-black/20" />
+      <div
+        className="
+          pointer-events-none
+          absolute
+          inset-0
+          bg-black/20
+        "
+      />
 
       <div
         className="
@@ -229,20 +298,27 @@ function Experience({
       />
 
 
-      {/* CONTENT */}
+      {/* =====================================
+          CONTENT
+      ===================================== */}
 
       <div
         ref={contentRef}
-        className="relative z-20 h-full w-full"
+        className="
+          relative
+          z-20
+          h-full
+          w-full
+        "
       >
 
         <SceneInfo scene={scene} />
 
-       <Player
-  scene={scene}
-  youtubePlayer={youtubePlayer}
-  youtubeReady={youtubeReady}
-/>
+        <Player
+          scene={scene}
+          youtubePlayer={youtubePlayer}
+          youtubeReady={youtubeReady}
+        />
 
         <SceneSelector
           sceneIndex={sceneIndex}
@@ -254,27 +330,44 @@ function Experience({
       </div>
 
 
-      {/* BRAND */}
+      {/* =====================================
+          BRAND
+      ===================================== */}
 
-      <div className="pointer-events-none absolute left-1/2 top-5 z-30 -translate-x-1/2">
-
-        <p className="font-mono text-[9px] uppercase tracking-[0.4em] text-white/55">
+      <div
+        className="
+          pointer-events-none
+          absolute
+          left-1/2
+          top-5
+          z-30
+          -translate-x-1/2
+        "
+      >
+        <p
+          className="
+            font-mono
+            text-[9px]
+            uppercase
+            tracking-[0.4em]
+            text-white/55
+          "
+        >
           SOMEWHERE.FM
         </p>
-
       </div>
 
 
-      {/* HIDDEN YOUTUBE ENGINE */}
+      {/* =====================================
+          HIDDEN YOUTUBE ENGINE
+      ===================================== */}
 
       <YouTubeEngine
         playlistId={
           scene.playlist?.playlistId
         }
         playerRef={youtubePlayer}
-        onReady={() => {
-          setYoutubeReady(true);
-        }}
+        onReady={handleYouTubeReady}
         onStateChange={
           handleYouTubeStateChange
         }

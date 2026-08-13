@@ -1,13 +1,25 @@
-import { Pause, Play, SkipBack, SkipForward } from "lucide-react";
+// src/components/Player.jsx
+
+import {
+  Pause,
+  Play,
+  SkipBack,
+  SkipForward,
+} from "lucide-react";
 
 import { useEffect, useRef, useState } from "react";
 import gsap from "gsap";
 import LiquidGlass from "./LiquidGlass";
 
-function Player({ scene, youtubePlayer, youtubeReady }) {
+function Player({
+  scene,
+  youtubePlayer,
+  youtubeReady,
+}) {
   const [playing, setPlaying] = useState(false);
   const [progress, setProgress] = useState(0);
   const [duration, setDuration] = useState(0);
+
   const [track, setTrack] = useState({
     title: "SOMEWHERE.FM",
     artist: "Waiting for signal...",
@@ -15,15 +27,21 @@ function Player({ scene, youtubePlayer, youtubeReady }) {
 
   const cdRef = useRef(null);
 
-  const player = youtubePlayer?.current;
-
   /*
-   * Reset visual player when scene changes
+   * ----------------------------------------
+   * RESET WHEN SCENE CHANGES
+   * ----------------------------------------
    */
+
   useEffect(() => {
     setPlaying(false);
     setProgress(0);
     setDuration(0);
+
+    setTrack({
+      title: "SOMEWHERE.FM",
+      artist: "Loading...",
+    });
 
     if (cdRef.current) {
       gsap.killTweensOf(cdRef.current);
@@ -35,8 +53,11 @@ function Player({ scene, youtubePlayer, youtubeReady }) {
   }, [scene.id]);
 
   /*
-   * CD rotation
+   * ----------------------------------------
+   * CD ROTATION
+   * ----------------------------------------
    */
+
   useEffect(() => {
     if (!cdRef.current) return;
 
@@ -58,31 +79,96 @@ function Player({ scene, youtubePlayer, youtubeReady }) {
     };
   }, [playing]);
 
-
-
   /*
-   * Read currently playing video information
+   * ----------------------------------------
+   * YOUTUBE STATE + PROGRESS
+   * ----------------------------------------
+   *
+   * YouTube is the source of truth.
    */
+
   useEffect(() => {
+    if (!youtubeReady) return;
+
+    const player = youtubePlayer?.current;
+
     if (!player) return;
 
-    const updateTrack = () => {
+    const updatePlayer = () => {
+      const state = player.getPlayerState?.();
+
+      const YT = window.YT;
+
+      if (YT?.PlayerState) {
+        if (state === YT.PlayerState.PLAYING) {
+          setPlaying(true);
+        }
+
+        if (
+          state === YT.PlayerState.PAUSED ||
+          state === YT.PlayerState.ENDED
+        ) {
+          setPlaying(false);
+        }
+      }
+
+      /*
+       * Current track metadata
+       */
+
       const data = player.getVideoData?.();
 
-      if (!data) return;
+      if (data?.video_id) {
+        setTrack({
+          title: data.title || "Somewhere",
+          artist: data.author || "SOMEWHERE.FM",
+        });
+      }
 
-      setTrack({
-        title: data.title || "Somewhere",
-        artist: data.author || "SOMEWHERE.FM",
-      });
+      /*
+       * Duration
+       */
+
+      const total = player.getDuration?.() || 0;
+
+      if (total > 0) {
+        setDuration(total);
+      }
+
+      /*
+       * Current playback position
+       */
+
+      const current = player.getCurrentTime?.() || 0;
+
+      if (total > 0) {
+        setProgress(
+          Math.min(100, (current / total) * 100)
+        );
+      }
     };
 
-    updateTrack();
+    updatePlayer();
 
-    const interval = setInterval(updateTrack, 1000);
+    const interval = setInterval(
+      updatePlayer,
+      250
+    );
 
-    return () => clearInterval(interval);
-  }, [player]);
+    return () => {
+      clearInterval(interval);
+    };
+  }, [
+    youtubeReady,
+    scene.id,
+    youtubePlayer,
+  ]);
+
+  /*
+   * ----------------------------------------
+   * PLAY / PAUSE
+   * ----------------------------------------
+   */
 
   const togglePlay = () => {
     const player = youtubePlayer?.current;
@@ -91,92 +177,131 @@ function Player({ scene, youtubePlayer, youtubeReady }) {
 
     const state = player.getPlayerState?.();
 
-    if (state === window.YT?.PlayerState?.PLAYING) {
+    if (
+      state === window.YT?.PlayerState?.PLAYING
+    ) {
       player.pauseVideo();
     } else {
       player.playVideo();
     }
   };
-  useEffect(() => {
-  const player = youtubePlayer?.current;
 
-  if (!player || !youtubeReady) return;
-
-  const updateTrack = () => {
-    const data = player.getVideoData?.();
-
-    if (!data) return;
-
-    setTrack({
-      title: data.title || "Somewhere",
-      artist: data.author || "SOMEWHERE.FM",
-    });
-
-    const total = player.getDuration?.() || 0;
-
-    if (total > 0) {
-      setDuration(total);
-    }
-  };
-
-  const interval = setInterval(updateTrack, 300);
-
-  return () => clearInterval(interval);
-}, [youtubePlayer, youtubeReady]);
+  /*
+   * ----------------------------------------
+   * NEXT TRACK
+   * ----------------------------------------
+   */
 
   const nextTrack = () => {
-  const player = youtubePlayer?.current;
+    const player = youtubePlayer?.current;
 
-  if (!player) return;
+    if (!player || !youtubeReady) return;
 
-  const playlist = player.getPlaylist?.();
+    const playlist = player.getPlaylist?.();
 
-  if (!playlist?.length) return;
+    if (!playlist || playlist.length === 0) {
+      console.warn(
+        "YouTube playlist is not ready yet."
+      );
+      return;
+    }
 
-  const currentIndex = player.getPlaylistIndex?.() ?? 0;
+    const currentIndex =
+      player.getPlaylistIndex?.() ?? 0;
 
-  const nextIndex =
-    currentIndex >= playlist.length - 1
-      ? 0
-      : currentIndex + 1;
+    const nextIndex =
+      currentIndex + 1 >= playlist.length
+        ? 0
+        : currentIndex + 1;
 
-      setProgress(0);
-  player.playVideoAt(nextIndex);
-};
-const previousTrack = () => {
-  const player = youtubePlayer?.current;
+    setProgress(0);
 
-  if (!player) return;
+    player.playVideoAt(nextIndex);
+  };
 
-  const playlist = player.getPlaylist?.();
+  /*
+   * ----------------------------------------
+   * PREVIOUS TRACK
+   * ----------------------------------------
+   */
 
-  if (!playlist?.length) return;
+  const previousTrack = () => {
+    const player = youtubePlayer?.current;
 
-  const currentIndex = player.getPlaylistIndex?.() ?? 0;
+    if (!player || !youtubeReady) return;
 
-  const previousIndex =
-    currentIndex <= 0
-      ? playlist.length - 1
-      : currentIndex - 1;
+    const playlist = player.getPlaylist?.();
 
-      setProgress(0);
-  player.playVideoAt(previousIndex);
-};
+    if (!playlist || playlist.length === 0) {
+      console.warn(
+        "YouTube playlist is not ready yet."
+      );
+      return;
+    }
+
+    const currentIndex =
+      player.getPlaylistIndex?.() ?? 0;
+
+    const previousIndex =
+      currentIndex - 1 < 0
+        ? playlist.length - 1
+        : currentIndex - 1;
+
+    setProgress(0);
+
+    player.playVideoAt(previousIndex);
+  };
+
+  /*
+   * ----------------------------------------
+   * FORMAT TIME
+   * ----------------------------------------
+   */
+
   const formatTime = (seconds) => {
-    if (!seconds || Number.isNaN(seconds)) {
+    if (
+      !seconds ||
+      Number.isNaN(seconds) ||
+      !Number.isFinite(seconds)
+    ) {
       return "0:00";
     }
 
     const mins = Math.floor(seconds / 60);
-    const secs = Math.floor(seconds % 60);
 
-    return `${mins}:${secs.toString().padStart(2, "0")}`;
+    const secs = Math.floor(
+      seconds % 60
+    );
+
+    return `${mins}:${secs
+      .toString()
+      .padStart(2, "0")}`;
   };
 
-  const currentSeconds = duration > 0 ? (duration * progress) / 100 : 0;
+  const currentSeconds =
+    duration > 0
+      ? (duration * progress) / 100
+      : 0;
+
+  /*
+   * ----------------------------------------
+   * UI
+   * ----------------------------------------
+   */
 
   return (
-    <div className="absolute bottom-7 left-1/2 z-40 w-[calc(100%-32px)] max-w-[600px] -translate-x-1/2 md:bottom-9">
+    <div
+      className="
+        absolute
+        bottom-7
+        left-1/2
+        z-40
+        w-[calc(100%-32px)]
+        max-w-[600px]
+        -translate-x-1/2
+        md:bottom-9
+      "
+    >
       <LiquidGlass
         className="
           min-h-[96px]
@@ -187,9 +312,19 @@ const previousTrack = () => {
         "
       >
         <div className="flex items-center gap-4">
-          {/* CD */}
 
-          <div className="relative -ml-2 shrink-0 md:-ml-3">
+          {/* =================================
+              CD
+          ================================= */}
+
+          <div
+            className="
+              relative
+              -ml-2
+              shrink-0
+              md:-ml-3
+            "
+          >
             <div
               ref={cdRef}
               className="
@@ -216,6 +351,9 @@ const previousTrack = () => {
                 `,
               }}
             >
+
+              {/* CD SHINE */}
+
               <div
                 className="
                   absolute
@@ -235,6 +373,8 @@ const previousTrack = () => {
                 }}
               />
 
+              {/* CENTER LABEL */}
+
               <div
                 className="
                   absolute
@@ -247,9 +387,12 @@ const previousTrack = () => {
                   rounded-full
                 "
                 style={{
-                  backgroundColor: scene.accent,
+                  backgroundColor:
+                    scene.accent,
                 }}
               />
+
+              {/* CENTER HOLE */}
 
               <div
                 className="
@@ -264,43 +407,111 @@ const previousTrack = () => {
                   bg-black
                 "
               />
+
             </div>
           </div>
 
-          {/* TRACK */}
+          {/* =================================
+              TRACK INFORMATION
+          ================================= */}
 
-          <div className="min-w-0 flex-1">
-            <p className="truncate text-[13px] font-medium text-white">
+          <div
+            className="
+              min-w-0
+              flex-1
+            "
+          >
+            <p
+              className="
+                truncate
+                text-[13px]
+                font-medium
+                text-white
+              "
+            >
               {track.title}
             </p>
 
-            <p className="mt-0.5 truncate text-[11px] text-white/50">
+            <p
+              className="
+                mt-0.5
+                truncate
+                text-[11px]
+                text-white/50
+              "
+            >
               {track.artist}
             </p>
 
-            <div className="mt-3 flex items-center gap-2">
-              <div className="h-[2px] flex-1 overflow-hidden rounded-full bg-white/15">
+            {/* PROGRESS */}
+
+            <div
+              className="
+                mt-3
+                flex
+                items-center
+                gap-2
+              "
+            >
+              <div
+                className="
+                  h-[2px]
+                  flex-1
+                  overflow-hidden
+                  rounded-full
+                  bg-white/15
+                "
+              >
                 <div
-                  className="h-full rounded-full transition-[width] duration-200"
+                  className="
+                    h-full
+                    rounded-full
+                    transition-[width]
+                    duration-200
+                  "
                   style={{
                     width: `${progress}%`,
-                    backgroundColor: scene.accent,
-                    boxShadow: `0 0 8px ${scene.accent}`,
+                    backgroundColor:
+                      scene.accent,
+                    boxShadow:
+                      `0 0 8px ${scene.accent}`,
                   }}
                 />
               </div>
 
-              <span className="font-mono text-[9px] text-white/40">
+              <span
+                className="
+                  shrink-0
+                  font-mono
+                  text-[9px]
+                  text-white/40
+                "
+              >
                 {formatTime(currentSeconds)}
               </span>
             </div>
           </div>
 
-          {/* CONTROLS */}
+          {/* =================================
+              CONTROLS
+          ================================= */}
 
-          <div className="flex shrink-0 items-center gap-1">
+          <div
+            className="
+              flex
+              shrink-0
+              items-center
+              gap-1
+            "
+          >
+
+            {/* PREVIOUS */}
+
             <button
+              type="button"
               onClick={previousTrack}
+              disabled={!youtubeReady}
+              aria-label="Previous track"
               className="
                 hidden
                 h-8
@@ -312,14 +523,25 @@ const previousTrack = () => {
                 transition
                 hover:bg-white/10
                 hover:text-white
+                disabled:cursor-not-allowed
+                disabled:opacity-30
                 sm:flex
               "
             >
               <SkipBack size={14} />
             </button>
 
+            {/* PLAY / PAUSE */}
+
             <button
+              type="button"
               onClick={togglePlay}
+              disabled={!youtubeReady}
+              aria-label={
+                playing
+                  ? "Pause"
+                  : "Play"
+              }
               className="
                 flex
                 h-11
@@ -334,17 +556,30 @@ const previousTrack = () => {
                 duration-200
                 hover:scale-105
                 active:scale-95
+                disabled:cursor-not-allowed
+                disabled:opacity-50
               "
             >
               {playing ? (
-                <Pause size={15} fill="currentColor" />
+                <Pause
+                  size={15}
+                  fill="currentColor"
+                />
               ) : (
-                <Play size={15} fill="currentColor" />
+                <Play
+                  size={15}
+                  fill="currentColor"
+                />
               )}
             </button>
 
+            {/* NEXT */}
+
             <button
+              type="button"
               onClick={nextTrack}
+              disabled={!youtubeReady}
+              aria-label="Next track"
               className="
                 hidden
                 h-8
@@ -356,11 +591,14 @@ const previousTrack = () => {
                 transition
                 hover:bg-white/10
                 hover:text-white
+                disabled:cursor-not-allowed
+                disabled:opacity-30
                 sm:flex
               "
             >
               <SkipForward size={14} />
             </button>
+
           </div>
         </div>
       </LiquidGlass>
