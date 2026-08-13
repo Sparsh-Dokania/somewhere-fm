@@ -1,3 +1,5 @@
+// src/data/scenes.jsx
+
 import backseatDesktop from "../assets/images/desktop/backseat.png";
 import backseatMobile from "../assets/images/mobile/backseat.png";
 
@@ -29,6 +31,25 @@ import somewhereElseDesktop from "../assets/images/desktop/somewhere-else.png";
 import somewhereElseMobile from "../assets/images/mobile/somewhere-else.png";
 
 
+const defaultTracks = [
+  {
+    title: "Something About Tonight",
+    artist: "SOMEWHERE.FM",
+    duration: 248,
+  },
+  {
+    title: "City Lights",
+    artist: "SOMEWHERE.FM",
+    duration: 221,
+  },
+  {
+    title: "After Midnight",
+    artist: "SOMEWHERE.FM",
+    duration: 267,
+  },
+];
+
+
 export const scenes = [
   {
     id: "backseat",
@@ -39,21 +60,7 @@ export const scenes = [
     desktopImage: backseatDesktop,
     mobileImage: backseatMobile,
     accent: "#D89B63",
-
-    playlist: [
-      {
-        title: "Song One",
-        artist: "Artist One",
-      },
-      {
-        title: "Song Two",
-        artist: "Artist Two",
-      },
-      {
-        title: "Song Three",
-        artist: "Artist Three",
-      },
-    ],
+    playlist: defaultTracks,
   },
 
   {
@@ -65,7 +72,7 @@ export const scenes = [
     desktopImage: lastTrainDesktop,
     mobileImage: lastTrainMobile,
     accent: "#C6A56B",
-    playlist: [],
+    playlist: defaultTracks,
   },
 
   {
@@ -77,7 +84,7 @@ export const scenes = [
     desktopImage: rainyAutoDesktop,
     mobileImage: rainyAutoMobile,
     accent: "#B9C7A4",
-    playlist: [],
+    playlist: defaultTracks,
   },
 
   {
@@ -89,7 +96,7 @@ export const scenes = [
     desktopImage: chaiDesktop,
     mobileImage: chaiMobile,
     accent: "#D6A85F",
-    playlist: [],
+    playlist: defaultTracks,
   },
 
   {
@@ -101,7 +108,7 @@ export const scenes = [
     desktopImage: truckDesktop,
     mobileImage: truckMobile,
     accent: "#D58B4A",
-    playlist: [],
+    playlist: defaultTracks,
   },
 
   {
@@ -113,7 +120,7 @@ export const scenes = [
     desktopImage: salonDesktop,
     mobileImage: salonMobile,
     accent: "#B57B63",
-    playlist: [],
+    playlist: defaultTracks,
   },
 
   {
@@ -125,7 +132,7 @@ export const scenes = [
     desktopImage: room207Desktop,
     mobileImage: room207Mobile,
     accent: "#C69B6B",
-    playlist: [],
+    playlist: defaultTracks,
   },
 
   {
@@ -137,7 +144,7 @@ export const scenes = [
     desktopImage: twoSeventeenDesktop,
     mobileImage: twoSeventeenMobile,
     accent: "#8A9DB5",
-    playlist: [],
+    playlist: defaultTracks,
   },
 
   {
@@ -149,7 +156,7 @@ export const scenes = [
     desktopImage: lastDeliveryDesktop,
     mobileImage: lastDeliveryMobile,
     accent: "#C47D54",
-    playlist: [],
+    playlist: defaultTracks,
   },
 
   {
@@ -161,6 +168,6 @@ export const scenes = [
     desktopImage: somewhereElseDesktop,
     mobileImage: somewhereElseMobile,
     accent: "#A66A69",
-    playlist: [],
+    playlist: defaultTracks,
   },
 ];

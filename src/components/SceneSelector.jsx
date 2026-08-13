@@ -7,7 +7,7 @@ function SceneSelector({
   onNext,
 }) {
   return (
-    <div className="absolute bottom-8 left-8 z-30 flex items-center gap-2">
+    <div className="absolute bottom-8 left-6 md:left-10 z-30 flex items-center gap-2">
       <button
         onClick={onPrevious}
         className="flex h-9 w-9 items-center justify-center rounded-full border border-white/20 bg-black/20 text-white/70 backdrop-blur-md transition hover:bg-white/10 hover:text-white"

@@ -1,17 +1,25 @@
+import Clock from "./Clock";
+
 function SceneInfo({ scene }) {
   return (
-    <div className="absolute left-6 top-6 z-20 md:left-10 md:top-10">
-      <p className="mb-2 font-mono text-[10px] uppercase tracking-[0.25em] text-white/60">
-        {scene.time} · {scene.location}
-      </p>
+    <div className="absolute left-6 top-20 z-30 md:left-10 md:top-24">
 
-      <h1 className="text-3xl font-light tracking-tight md:text-5xl">
+      <div className="mb-3 flex items-center gap-2 font-mono text-[10px] uppercase tracking-[0.2em] text-white/65">
+        <Clock />
+
+        <span className="text-white/30">·</span>
+
+        <span>{scene.location}</span>
+      </div>
+
+      <h1 className="text-4xl font-light tracking-[-0.04em] text-white md:text-6xl">
         {scene.title}
       </h1>
 
-      <p className="mt-2 text-sm text-white/60">
+      <p className="mt-3 text-sm text-white/55">
         {scene.description}
       </p>
+
     </div>
   );
 }
