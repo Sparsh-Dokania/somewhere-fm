@@ -7,6 +7,7 @@ import Player from "./Player";
 import SceneInfo from "./SceneInfo";
 import SceneSelector from "./SceneSelector";
 import YouTubeEngine from "./YouTubeEngine";
+import { scenes } from "../data/scenes";
 
 function Experience({
   scene,
@@ -16,12 +17,13 @@ function Experience({
 }) {
   const backgroundRef = useRef(null);
   const contentRef = useRef(null);
+  const infoRef = useRef(null);
+  const playerRef = useRef(null);
+
   const youtubePlayer = useRef(null);
-
-  const [youtubeReady, setYoutubeReady] =
-    useState(false);
-
   const transitionRef = useRef(false);
+
+  const [youtubeReady, setYoutubeReady] = useState(false);
 
   /*
    * ----------------------------------------
@@ -45,76 +47,92 @@ function Experience({
       },
     });
 
-    /*
-     * The whole scene doesn't disappear.
-     *
-     * We slightly:
-     * - scale
-     * - blur
-     * - shift
-     *
-     * Then change the scene underneath.
-     */
-
+    // Background subtly moves away
     tl.to(
       backgroundRef.current,
       {
         scale: 1.035,
-        filter: "blur(5px)",
-        duration: 0.28,
+        xPercent: nextIndex > sceneIndex ? -0.6 : 0.6,
+        filter: "blur(3px)",
+        duration: 0.35,
         ease: "power2.inOut",
       },
       0
     );
 
+    // Scene information gently moves
     tl.to(
-      contentRef.current,
+      infoRef.current,
       {
-        y: -4,
-        opacity: 0.78,
-        duration: 0.2,
+        opacity: 0.35,
+        y: -6,
+        duration: 0.22,
+        ease: "power2.in",
+      },
+      0
+    );
+
+    // Player barely moves
+    tl.to(
+      playerRef.current,
+      {
+        y: 4,
+        opacity: 0.85,
+        duration: 0.25,
         ease: "power2.inOut",
       },
       0
     );
 
-    /*
-     * CHANGE SCENE
-     */
-
+    // Change actual scene
     tl.call(() => {
       onChangeScene(nextIndex);
     });
 
-    /*
-     * NEW SCENE SETTLES
-     */
-
+    // New background settles
     tl.to(
       backgroundRef.current,
       {
         scale: 1,
+        xPercent: 0,
         filter: "blur(0px)",
-        duration: 0.65,
+        duration: 0.7,
         ease: "power3.out",
       }
     );
 
+    // New information arrives
+    tl.fromTo(
+      infoRef.current,
+      {
+        opacity: 0,
+        y: 8,
+      },
+      {
+        opacity: 1,
+        y: 0,
+        duration: 0.5,
+        ease: "power3.out",
+      },
+      "-=0.55"
+    );
+
+    // Player settles
     tl.to(
-      contentRef.current,
+      playerRef.current,
       {
         y: 0,
         opacity: 1,
         duration: 0.45,
         ease: "power3.out",
       },
-      "-=0.5"
+      "-=0.45"
     );
   };
 
   /*
    * ----------------------------------------
-   * SCENE NAVIGATION
+   * NAVIGATION
    * ----------------------------------------
    */
 
@@ -181,7 +199,7 @@ function Experience({
 
   /*
    * ----------------------------------------
-   * LOAD SCENE PLAYLIST
+   * LOAD PLAYLIST
    * ----------------------------------------
    */
 
@@ -247,7 +265,6 @@ function Experience({
         "
       >
         <picture>
-
           <source
             media="(max-width: 768px)"
             srcSet={scene.mobileImage}
@@ -262,9 +279,9 @@ function Experience({
               object-cover
             "
           />
-
         </picture>
       </div>
+
 
       {/* ATMOSPHERE */}
 
@@ -287,6 +304,7 @@ function Experience({
         "
       />
 
+
       {/* CONTENT */}
 
       <div
@@ -296,24 +314,46 @@ function Experience({
           z-20
           h-full
           w-full
-          will-change-transform
         "
       >
-        <SceneInfo scene={scene} />
 
-        <Player
-          scene={scene}
-          youtubePlayer={youtubePlayer}
-          youtubeReady={youtubeReady}
-        />
+        {/* SCENE INFO */}
 
-        <SceneSelector
-          sceneIndex={sceneIndex}
-          totalScenes={totalScenes}
-          onPrevious={previousScene}
-          onNext={nextScene}
-        />
+        <div ref={infoRef}>
+          <SceneInfo scene={scene} />
+        </div>
+
+
+        {/* PLAYER */}
+
+        <div
+          ref={playerRef}
+          className="
+            absolute
+            inset-0
+            pointer-events-none
+          "
+        >
+          <div className="pointer-events-auto">
+            <Player
+              scene={scene}
+              youtubePlayer={youtubePlayer}
+              youtubeReady={youtubeReady}
+            />
+          </div>
+        </div>
+
+
+        {/* SCENE SELECTOR */}
+
+       <SceneSelector
+  sceneIndex={sceneIndex}
+  totalScenes={totalScenes}
+  scenes={scenes}
+  onChangeScene={changeScene}
+/>
       </div>
+
 
       {/* BRAND */}
 
@@ -340,7 +380,8 @@ function Experience({
         </p>
       </div>
 
-      {/* YOUTUBE */}
+
+      {/* YOUTUBE ENGINE */}
 
       <YouTubeEngine
         playlistId={

@@ -33,12 +33,14 @@ import somewhereElseMobile from "../assets/images/mobile/somewhere-else.png";
 
 export const scenes = [
   {
-    id: "backseat",
-    title: "बैकसीट रेडियो",
+    id: "taxi-radio",
+    title: "टैक्सी रेडियो",
     location: "दिल्ली",
-    description: "लंबा दिन था?",
+    description: "शहर के बीचों-बीच, कुछ गाने आपके नाम।",
+
     desktopImage: backseatDesktop,
     mobileImage: backseatMobile,
+
     accent: "#D89B63",
 
     playlist: {
@@ -48,13 +50,16 @@ export const scenes = [
     },
   },
 
+
   {
-    id: "last-train",
-    title: "आख़िरी ट्रेन",
-    location: "प्लेटफ़ॉर्म ४",
-    description: "आज की आख़िरी सवारी।",
+    id: "safarnama",
+    title: "सफ़रनामा",
+    location: "रास्ते में कहीं",
+    description: "मंज़िल से ज़्यादा रास्ता याद रहता है।",
+
     desktopImage: lastTrainDesktop,
     mobileImage: lastTrainMobile,
+
     accent: "#C6A56B",
 
     playlist: {
@@ -64,13 +69,16 @@ export const scenes = [
     },
   },
 
+
   {
-    id: "rainy-auto",
-    title: "बारिश वाला ऑटो",
+    id: "baarish-safar",
+    title: "बारिश में सफ़र",
     location: "कहीं एनसीआर में",
-    description: "बारिश को अपना काम करने दो।",
+    description: "बारिश हो, रास्ता हो और कुछ अच्छे गाने।",
+
     desktopImage: rainyAutoDesktop,
     mobileImage: rainyAutoMobile,
+
     accent: "#B9C7A4",
 
     playlist: {
@@ -80,13 +88,16 @@ export const scenes = [
     },
   },
 
+
   {
-    id: "chai",
-    title: "सुबह ६:४३ की चाय",
-    location: "शहर जाग रहा है",
-    description: "शोर शुरू होने से पहले।",
+    id: "chai-ki-tapri",
+    title: "चाय की टपरी",
+    location: "सुबह ६:४३",
+    description: "शहर जागने से पहले की वो पहली चाय।",
+
     desktopImage: chaiDesktop,
     mobileImage: chaiMobile,
+
     accent: "#D6A85F",
 
     playlist: {
@@ -96,13 +107,16 @@ export const scenes = [
     },
   },
 
+
   {
-    id: "truck",
+    id: "truck-driver-radio",
     title: "ट्रक ड्राइवर रेडियो",
     location: "एनएच ४४",
     description: "रास्ते लंबे हैं। रातें उससे भी लंबी।",
+
     desktopImage: truckDesktop,
     mobileImage: truckMobile,
+
     accent: "#D58B4A",
 
     playlist: {
@@ -121,13 +135,16 @@ export const scenes = [
     ],
   },
 
+
   {
-    id: "salon",
-    title: "सैलून २००७",
-    location: "किसी मोहल्ले में",
+    id: "deluxe-salon",
+    title: "डीलक्स सैलून",
+    location: "किसी पुराने मोहल्ले में",
     description: "आपका नंबर अगला है।",
+
     desktopImage: salonDesktop,
     mobileImage: salonMobile,
+
     accent: "#B57B63",
 
     playlist: {
@@ -137,13 +154,16 @@ export const scenes = [
     },
   },
 
+
   {
-    id: "room-207",
-    title: "कमरा २०७",
-    location: "चेक-इन",
-    description: "किसी को पता नहीं तुम यहाँ हो।",
+    id: "mai-wo-aur-yeh-gaane",
+    title: "मैं, वो और ये गाने",
+    location: "कहीं यादों में",
+    description: "कुछ गाने लोगों से ज़्यादा याद रहते हैं।",
+
     desktopImage: room207Desktop,
     mobileImage: room207Mobile,
+
     accent: "#C69B6B",
 
     playlist: {
@@ -153,13 +173,16 @@ export const scenes = [
     },
   },
 
+
   {
-    id: "two-seventeen",
-    title: "रात २:१७",
-    location: "अभी भी जाग रहे हो",
-    description: "सो जाना चाहिए था।",
+    id: "akeli-raat",
+    title: "अकेली रात",
+    location: "२:०० AM",
+    description: "2 AM special playlist",
+
     desktopImage: twoSeventeenDesktop,
     mobileImage: twoSeventeenMobile,
+
     accent: "#8A9DB5",
 
     playlist: {
@@ -169,13 +192,16 @@ export const scenes = [
     },
   },
 
+
   {
-    id: "last-delivery",
-    title: "आख़िरी डिलीवरी",
-    location: "सेक्टर १८",
-    description: "बस एक और। फिर घर।",
+    id: "zindagi",
+    title: "ज़िंदगी",
+    location: "चलते-चलते",
+    description: "कभी-कभी बस चलते रहना होता है।",
+
     desktopImage: lastDeliveryDesktop,
     mobileImage: lastDeliveryMobile,
+
     accent: "#C47D54",
 
     playlist: {
@@ -185,13 +211,16 @@ export const scenes = [
     },
   },
 
+
   {
-    id: "somewhere-else",
-    title: "कहीं और",
-    location: "अज्ञात",
-    description: "तुम्हें यह जगह नहीं मिलनी चाहिए थी।",
+    id: "khayalon-mein",
+    title: "ख़यालों में",
+    location: "कहीं और",
+    description: "जहाँ ख़याल आपको ले जाएँ।",
+
     desktopImage: somewhereElseDesktop,
     mobileImage: somewhereElseMobile,
+
     accent: "#A66A69",
 
     playlist: {

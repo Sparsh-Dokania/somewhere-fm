@@ -14,12 +14,7 @@ function loadYouTubeAPI() {
   }
 
   youtubePromise = new Promise((resolve) => {
-    const previousCallback =
-      window.onYouTubeIframeAPIReady;
-
     window.onYouTubeIframeAPIReady = () => {
-      previousCallback?.();
-
       resolve(window.YT);
     };
 
@@ -41,19 +36,18 @@ function YouTubeEngine({
   playlistId,
   playerRef,
   onReady,
-  onStateChange,
 }) {
   const containerRef = useRef(null);
   const initializedRef = useRef(false);
 
   /*
-   * Create YouTube player ONCE
+   * CREATE PLAYER ONCE
    */
 
   useEffect(() => {
     let cancelled = false;
 
-    const initialize = async () => {
+    async function initialize() {
       const YT = await loadYouTubeAPI();
 
       if (
@@ -66,7 +60,7 @@ function YouTubeEngine({
 
       initializedRef.current = true;
 
-      const player = new YT.Player(
+      new YT.Player(
         containerRef.current,
         {
           width: "200",
@@ -88,14 +82,10 @@ function YouTubeEngine({
 
               onReady?.(event);
             },
-
-            onStateChange: (event) => {
-              onStateChange?.(event);
-            },
           },
         }
       );
-    };
+    }
 
     initialize();
 
@@ -105,7 +95,7 @@ function YouTubeEngine({
   }, []);
 
   /*
-   * Load new playlist when scene changes
+   * LOAD NEW PLAYLIST
    */
 
   useEffect(() => {

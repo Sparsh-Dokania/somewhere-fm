@@ -1,86 +1,83 @@
-import { ChevronLeft, ChevronRight } from "lucide-react";
+// src/components/SceneSelector.jsx
+
+import OptionWheel from "./OptionWheel";
 
 function SceneSelector({
   sceneIndex,
   totalScenes,
-  onPrevious,
-  onNext,
+  scenes,
+  onChangeScene,
 }) {
+  const items =
+    scenes?.map((scene) => scene.title) ||
+    Array.from(
+      { length: totalScenes },
+      (_, i) => `Scene ${i + 1}`
+    );
+
   return (
     <div
       className="
+        pointer-events-auto
         absolute
-        bottom-8
-        left-6
-        z-30
-        flex
-        items-center
-        gap-2
-        md:left-10
+        bottom-[145px]
+        left-0
+        z-40
+        h-[300px]
+        w-[270px]
+
+        sm:bottom-8
+        sm:h-[360px]
+        sm:w-[320px]
+
+        md:bottom-8
+        md:h-[400px]
+        md:w-[360px]
       "
     >
-      <button
-        type="button"
-        onClick={onPrevious}
-        aria-label="Previous scene"
-        className="
-          flex
-          h-8
-          w-8
-          items-center
-          justify-center
-          rounded-full
-          border
-          border-white/10
-          bg-black/10
-          text-white/45
-          backdrop-blur-md
-          transition
-          hover:bg-white/10
-          hover:text-white
-        "
-      >
-        <ChevronLeft size={14} />
-      </button>
+      <OptionWheel
+        items={items}
 
-      <span
-        className="
-          min-w-[42px]
-          text-center
-          font-mono
-          text-[8px]
-          tracking-[0.2em]
-          text-white/40
-        "
-      >
-        {String(sceneIndex + 1).padStart(2, "0")}
-        {" / "}
-        {String(totalScenes).padStart(2, "0")}
-      </span>
+        /*
+         * IMPORTANT:
+         * Actual sceneIndex is always the selected wheel item.
+         */
+        defaultSelected={sceneIndex}
 
-      <button
-        type="button"
-        onClick={onNext}
-        aria-label="Next scene"
-        className="
-          flex
-          h-8
-          w-8
-          items-center
-          justify-center
-          rounded-full
-          border
-          border-white/10
-          bg-black/10
-          text-white/45
-          backdrop-blur-md
-          transition
-          hover:bg-white/10
-          hover:text-white
-        "
-      >
-        <ChevronRight size={14} />
-      </button>
+        textColor="rgba(255,255,255,0.30)"
+        activeColor="#ffffff"
+
+        side="left"
+
+        fontSize={1.15}
+        spacing={1.65}
+
+        curve={1.1}
+        tilt={6}
+
+        blur={1.2}
+        fade={0.24}
+        minOpacity={0.04}
+
+        smoothing={240}
+
+        inset={24}
+
+        loop={false}
+        draggable={true}
+
+        /*
+         * Wheel itself is allowed to move only ONE scene
+         * per scroll gesture.
+         */
+        onChange={(index) => {
+          if (index !== sceneIndex) {
+            onChangeScene(index);
+          }
+        }}
+
+        className="h-full w-full"
+      />
     </div>
   );
 }
