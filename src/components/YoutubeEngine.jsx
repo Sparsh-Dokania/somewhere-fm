@@ -99,25 +99,24 @@ function YouTubeEngine({
    */
 
   useEffect(() => {
-    const player = playerRef.current;
+  const player = playerRef.current;
 
-    if (
-      !player ||
-      !playlistId ||
-      typeof player.loadPlaylist !==
-        "function"
-    ) {
-      return;
-    }
+  if (
+    !player ||
+    !playlistId ||
+    typeof player.loadPlaylist !== "function"
+  ) {
+    return;
+  }
 
-    player.loadPlaylist({
-      listType: "playlist",
-      list: playlistId,
-      index: 0,
-    });
+  player.loadPlaylist({
+    listType: "playlist",
+    list: playlistId,
+    index: 0,
+  });
 
-    player.pauseVideo();
-  }, [playlistId]);
+  player.pauseVideo();
+}, [playlistId, onReady]);
 
   return (
     <div

@@ -30,13 +30,18 @@ function Player({
     artist: "Waiting for signal...",
   });
 
-  const [thumbnail, setThumbnail] =
-    useState(null);
-
+  const [thumbnail, setThumbnail] = useState(null);
   const [changingTrack, setChangingTrack] =
     useState(false);
 
   const cdRef = useRef(null);
+
+  /*
+   * Keep our own playlist position.
+   * This prevents navigation from depending
+   * entirely on YouTube's getPlaylist().
+   */
+  const trackIndexRef = useRef(0);
 
   /*
    * ----------------------------------------
@@ -45,6 +50,8 @@ function Player({
    */
 
   useEffect(() => {
+    trackIndexRef.current = 0;
+
     setPlaying(false);
     setProgress(0);
     setDuration(0);
@@ -95,15 +102,14 @@ function Player({
 
   /*
    * ----------------------------------------
-   * READ YOUTUBE STATE + TRACK INFO
+   * READ YOUTUBE STATE
    * ----------------------------------------
    */
 
   useEffect(() => {
     if (!youtubeReady) return;
 
-    const player =
-      youtubePlayer?.current;
+    const player = youtubePlayer?.current;
 
     if (!player) return;
 
@@ -119,32 +125,28 @@ function Player({
 
       if (YT?.PlayerState) {
         if (
-          state ===
-          YT.PlayerState.PLAYING
+          state === YT.PlayerState.PLAYING
         ) {
           setPlaying(true);
           setChangingTrack(false);
         }
 
         if (
-          state ===
-            YT.PlayerState.PAUSED ||
-          state ===
-            YT.PlayerState.ENDED
+          state === YT.PlayerState.PAUSED ||
+          state === YT.PlayerState.ENDED
         ) {
           setPlaying(false);
         }
 
         if (
-          state ===
-          YT.PlayerState.BUFFERING
+          state === YT.PlayerState.BUFFERING
         ) {
           setChangingTrack(true);
         }
       }
 
       /*
-       * VIDEO DATA
+       * TRACK INFORMATION
        */
 
       const data =
@@ -153,16 +155,29 @@ function Player({
       if (data?.video_id) {
         setTrack({
           title:
-            data.title ||
-            "Somewhere",
+            data.title || "Somewhere",
           artist:
-            data.author ||
-            "SOMEWHERE.FM",
+            data.author || "SOMEWHERE.FM",
         });
 
         setThumbnail(
           `https://i.ytimg.com/vi/${data.video_id}/hqdefault.jpg`
         );
+      }
+
+      /*
+       * Keep our local index synchronized
+       * with YouTube whenever possible.
+       */
+
+      const apiIndex =
+        player.getPlaylistIndex?.();
+
+      if (
+        typeof apiIndex === "number" &&
+        apiIndex >= 0
+      ) {
+        trackIndexRef.current = apiIndex;
       }
 
       /*
@@ -229,10 +244,10 @@ function Player({
     const state =
       player.getPlayerState?.();
 
-    const playingState =
-      window.YT?.PlayerState?.PLAYING;
-
-    if (state === playingState) {
+    if (
+      state ===
+      window.YT?.PlayerState?.PLAYING
+    ) {
       player.pauseVideo();
     } else {
       player.playVideo();
@@ -241,83 +256,35 @@ function Player({
 
   /*
    * ----------------------------------------
-   * GET PLAYLIST INFORMATION
+   * GET PLAYLIST LENGTH
    * ----------------------------------------
    */
 
-  const getPlaylistInfo = () => {
+  const getPlaylistLength = () => {
     const player =
       youtubePlayer?.current;
 
-    if (
-      !player ||
-      !youtubeReady
-    ) {
-      return null;
-    }
+    if (!player) return 0;
 
     const playlist =
       player.getPlaylist?.();
 
     if (
-      !Array.isArray(playlist) ||
-      playlist.length === 0
+      Array.isArray(playlist) &&
+      playlist.length > 0
     ) {
-      return null;
+      return playlist.length;
     }
 
     /*
-     * Find the current video using
-     * the actual YouTube video ID.
+     * YouTube sometimes temporarily
+     * doesn't expose getPlaylist().
+     *
+     * Return 0 so we can use the native
+     * nextVideo / previousVideo fallback.
      */
 
-    const videoData =
-      player.getVideoData?.();
-
-    const currentVideoId =
-      videoData?.video_id;
-
-    let currentIndex = -1;
-
-    if (currentVideoId) {
-      currentIndex =
-        playlist.indexOf(
-          currentVideoId
-        );
-    }
-
-    /*
-     * Fallback to YouTube's
-     * playlist index.
-     */
-
-    if (currentIndex === -1) {
-      const apiIndex =
-        player.getPlaylistIndex?.();
-
-      if (
-        typeof apiIndex === "number" &&
-        apiIndex >= 0 &&
-        apiIndex < playlist.length
-      ) {
-        currentIndex =
-          apiIndex;
-      }
-    }
-
-    /*
-     * Final fallback.
-     */
-
-    if (currentIndex === -1) {
-      currentIndex = 0;
-    }
-
-    return {
-      player,
-      playlist,
-      currentIndex,
-    };
+    return 0;
   };
 
   /*
@@ -327,63 +294,90 @@ function Player({
    */
 
   const nextTrack = () => {
-    const info =
-      getPlaylistInfo();
+    const player =
+      youtubePlayer?.current;
 
-    if (!info) {
-      console.warn(
-        "SOMEWHERE.FM: Playlist not ready"
-      );
+    if (
+      !player ||
+      !youtubeReady
+    ) {
       return;
     }
-
-    const {
-      player,
-      playlist,
-      currentIndex,
-    } = info;
-
-    const nextIndex =
-      currentIndex >=
-      playlist.length - 1
-        ? 0
-        : currentIndex + 1;
-
-    console.log(
-      "SOMEWHERE.FM NEXT:",
-      {
-        currentIndex,
-        nextIndex,
-        total: playlist.length,
-      }
-    );
 
     setProgress(0);
     setChangingTrack(true);
 
+    const playlistLength =
+      getPlaylistLength();
+
     /*
-     * Explicitly select the
-     * next video.
+     * CASE 1:
+     * We know the playlist.
+     *
+     * Explicitly choose next index.
      */
 
-    try {
-      player.playVideoAt(
-        nextIndex
-      );
-    } catch (error) {
-      console.warn(
-        "playVideoAt failed:",
-        error
+    if (playlistLength > 0) {
+      const currentIndex =
+        player.getPlaylistIndex?.();
+
+      if (
+        typeof currentIndex === "number" &&
+        currentIndex >= 0
+      ) {
+        trackIndexRef.current =
+          currentIndex;
+      }
+
+      const nextIndex =
+        trackIndexRef.current >=
+        playlistLength - 1
+          ? 0
+          : trackIndexRef.current + 1;
+
+      trackIndexRef.current =
+        nextIndex;
+
+      console.log(
+        "SOMEWHERE.FM → NEXT",
+        {
+          current:
+            currentIndex,
+          next:
+            nextIndex,
+          total:
+            playlistLength,
+        }
       );
 
       try {
-        player.nextVideo();
-      } catch (fallbackError) {
+        player.playVideoAt(
+          nextIndex
+        );
+
+        return;
+      } catch (error) {
         console.warn(
-          "nextVideo failed:",
-          fallbackError
+          "playVideoAt failed, using nextVideo()",
+          error
         );
       }
+    }
+
+    /*
+     * CASE 2:
+     * Playlist temporarily unavailable.
+     *
+     * Let YouTube handle navigation.
+     */
+
+    try {
+      player.nextVideo();
+    } catch (error) {
+      console.error(
+        "SOMEWHERE.FM next track failed:",
+        error
+      );
     }
   };
 
@@ -394,62 +388,85 @@ function Player({
    */
 
   const previousTrack = () => {
-    const info =
-      getPlaylistInfo();
+    const player =
+      youtubePlayer?.current;
 
-    if (!info) {
-      console.warn(
-        "SOMEWHERE.FM: Playlist not ready"
-      );
+    if (
+      !player ||
+      !youtubeReady
+    ) {
       return;
     }
-
-    const {
-      player,
-      playlist,
-      currentIndex,
-    } = info;
-
-    const previousIndex =
-      currentIndex <= 0
-        ? playlist.length - 1
-        : currentIndex - 1;
-
-    console.log(
-      "SOMEWHERE.FM PREVIOUS:",
-      {
-        currentIndex,
-        previousIndex,
-        total: playlist.length,
-      }
-    );
 
     setProgress(0);
     setChangingTrack(true);
 
+    const playlistLength =
+      getPlaylistLength();
+
     /*
-     * Explicitly select the
-     * previous video.
+     * CASE 1:
+     * Explicit playlist navigation.
      */
 
-    try {
-      player.playVideoAt(
-        previousIndex
-      );
-    } catch (error) {
-      console.warn(
-        "playVideoAt failed:",
-        error
+    if (playlistLength > 0) {
+      const currentIndex =
+        player.getPlaylistIndex?.();
+
+      if (
+        typeof currentIndex === "number" &&
+        currentIndex >= 0
+      ) {
+        trackIndexRef.current =
+          currentIndex;
+      }
+
+      const previousIndex =
+        trackIndexRef.current <= 0
+          ? playlistLength - 1
+          : trackIndexRef.current - 1;
+
+      trackIndexRef.current =
+        previousIndex;
+
+      console.log(
+        "SOMEWHERE.FM → PREVIOUS",
+        {
+          current:
+            currentIndex,
+          previous:
+            previousIndex,
+          total:
+            playlistLength,
+        }
       );
 
       try {
-        player.previousVideo();
-      } catch (fallbackError) {
+        player.playVideoAt(
+          previousIndex
+        );
+
+        return;
+      } catch (error) {
         console.warn(
-          "previousVideo failed:",
-          fallbackError
+          "playVideoAt failed, using previousVideo()",
+          error
         );
       }
+    }
+
+    /*
+     * CASE 2:
+     * Playlist temporarily unavailable.
+     */
+
+    try {
+      player.previousVideo();
+    } catch (error) {
+      console.error(
+        "SOMEWHERE.FM previous track failed:",
+        error
+      );
     }
   };
 
@@ -515,9 +532,7 @@ function Player({
       >
         <div className="flex items-center gap-4">
 
-          {/* =========================
-              CD / ARTWORK
-          ========================= */}
+          {/* CD */}
 
           <div
             ref={cdRef}
@@ -615,9 +630,7 @@ function Player({
             />
           </div>
 
-          {/* =========================
-              TRACK INFORMATION
-          ========================= */}
+          {/* TRACK */}
 
           <div
             className="
@@ -689,8 +702,6 @@ function Player({
               {track.artist}
             </p>
 
-            {/* PROGRESS */}
-
             <div
               className="
                 mt-3
@@ -740,9 +751,7 @@ function Player({
             </div>
           </div>
 
-          {/* =========================
-              CONTROLS
-          ========================= */}
+          {/* CONTROLS */}
 
           <div
             className="
@@ -752,9 +761,6 @@ function Player({
               gap-1
             "
           >
-
-            {/* PREVIOUS */}
-
             <button
               type="button"
               onClick={previousTrack}
@@ -777,8 +783,6 @@ function Player({
             >
               <SkipBack size={14} />
             </button>
-
-            {/* PLAY / PAUSE */}
 
             <button
               type="button"
@@ -820,8 +824,6 @@ function Player({
               )}
             </button>
 
-            {/* NEXT */}
-
             <button
               type="button"
               onClick={nextTrack}
@@ -844,8 +846,8 @@ function Player({
             >
               <SkipForward size={14} />
             </button>
-
           </div>
+
         </div>
       </LiquidGlass>
     </div>

@@ -203,30 +203,7 @@ function Experience({
    * ----------------------------------------
    */
 
-  useEffect(() => {
-    const player = youtubePlayer.current;
-
-    if (
-      !youtubeReady ||
-      !player ||
-      !scene.playlist?.playlistId
-    ) {
-      return;
-    }
-
-    player.loadPlaylist({
-      listType: "playlist",
-      list: scene.playlist.playlistId,
-      index: 0,
-    });
-
-    player.pauseVideo();
-  }, [
-    scene.id,
-    scene.playlist?.playlistId,
-    youtubeReady,
-  ]);
-
+  
   /*
    * ----------------------------------------
    * YOUTUBE READY
