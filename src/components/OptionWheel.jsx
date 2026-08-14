@@ -1,53 +1,71 @@
+// src/components/OptionWheel.jsx
+
 import {
-  useRef,
-  useState,
   useCallback,
   useEffect,
+  useRef,
+  useState,
 } from "react";
 
 const OptionWheel = ({
   items = [],
   defaultSelected = 0,
   onChange,
+
   textColor = "#a6a6a6",
   activeColor = "#ffffff",
+
   side = "left",
-  fontSize = 3,
-  spacing = 1.4,
+
+  fontSize = 1.1,
+  spacing = 1.5,
   curve = 1,
   tilt = 6,
-  blur = 2,
-  fade = 0.25,
+
+  blur = 1.2,
+  fade = 0.24,
   minOpacity = 0.05,
-  smoothing = 200,
-  inset = 80,
+
+  smoothing = 220,
+  inset = 16,
+
   loop = false,
   draggable = true,
+
   soundUrl = "",
   soundVolume = 0.5,
+
   className = "",
 }) => {
   const rootRef = useRef(null);
   const itemRefs = useRef([]);
 
-  const posRef = useRef(defaultSelected);
-  const targetRef = useRef(defaultSelected);
+  const posRef =
+    useRef(defaultSelected);
+
+  const targetRef =
+    useRef(defaultSelected);
+
   const rafRef = useRef(null);
   const lastRef = useRef(0);
 
   const cfgRef = useRef({});
-  const onChangeRef = useRef(onChange);
-  const selectedRef = useRef(defaultSelected);
+  const onChangeRef =
+    useRef(onChange);
 
-  const wheelTimerRef = useRef(null);
-
-  const dragRef = useRef(null);
-  const dragMovedRef = useRef(false);
+  const selectedRef =
+    useRef(defaultSelected);
 
   const audioRef = useRef(null);
   const audioUrlRef = useRef("");
   const lastTickRef = useRef(0);
-  const wheelLockRef = useRef(false);
+
+  const wheelLockRef =
+    useRef(false);
+
+  const dragRef = useRef(null);
+  const dragMovedRef =
+    useRef(false);
 
   const [selectedIndex, setSelectedIndex] =
     useState(defaultSelected);
@@ -55,12 +73,18 @@ const OptionWheel = ({
   const [isDragging, setIsDragging] =
     useState(false);
 
+  /*
+   * ========================================
+   * CONFIG
+   * ========================================
+   */
+
   const remPx =
     typeof window !== "undefined"
       ? parseFloat(
           getComputedStyle(
-            document.documentElement
-          ).fontSize
+            document.documentElement,
+          ).fontSize,
         ) || 16
       : 16;
 
@@ -69,402 +93,604 @@ const OptionWheel = ({
   cfgRef.current = {
     count: items.length,
     items,
+
     rowH: Math.max(
-      fontSize * spacing * remPx,
-      1
+      fontSize *
+        spacing *
+        remPx,
+      1,
     ),
+
     curve,
     tilt,
     blur,
     fade,
     minOpacity,
+
     side,
     loop,
     smoothing,
     draggable,
+
     soundUrl,
     soundVolume,
+
+    textColor,
+    activeColor,
   };
 
-  const runFrame = useCallback((now) => {
-    const dt = Math.min(
-      (now - lastRef.current) / 1000,
-      0.05
-    );
+  /*
+   * ========================================
+   * RENDER LOOP
+   * ========================================
+   */
 
-    lastRef.current = now;
+  const runFrame = useCallback(
+    (now) => {
+      const dt = Math.min(
+        (now -
+          lastRef.current) /
+          1000,
+        0.05,
+      );
 
-    const cfg = cfgRef.current;
+      lastRef.current = now;
 
-    const tau =
-      Math.max(cfg.smoothing, 1) / 1000;
+      const cfg =
+        cfgRef.current;
 
-    const k =
-      1 - Math.exp(-dt / tau);
+      const tau =
+        Math.max(
+          cfg.smoothing,
+          1,
+        ) / 1000;
 
-    const target = targetRef.current;
-    const cur = posRef.current;
-
-    let next =
-      cur + (target - cur) * k;
-
-    const settled =
-      Math.abs(target - next) < 0.001;
-
-    if (settled) {
-      next = target;
-    }
-
-    posRef.current = next;
-
-    const els = itemRefs.current;
-    const n = cfg.count;
-
-    const mirror =
-      cfg.side === "right" ? -1 : 1;
-
-    const tiltRad =
-      (cfg.tilt * Math.PI) / 180;
-
-    const R =
-      tiltRad > 0.0005
-        ? cfg.rowH / tiltRad
-        : 0;
-
-    for (let i = 0; i < n; i++) {
-      const el = els[i];
-
-      if (!el) continue;
-
-      let d = i - next;
-
-      if (cfg.loop && n > 1) {
-        d = ((d % n) + n) % n;
-
-        if (d > n / 2) {
-          d -= n;
-        }
-      }
-
-      const dist = Math.abs(d);
-
-      let x = 0;
-      let y = d * cfg.rowH;
-      let rot = 0;
-
-      if (R > 0) {
-        const ang = Math.max(
-          -Math.PI / 2,
-          Math.min(
-            Math.PI / 2,
-            d * tiltRad
-          )
+      const k =
+        1 -
+        Math.exp(
+          -dt / tau,
         );
 
-        y = R * Math.sin(ang);
+      const target =
+        targetRef.current;
 
-        x =
-          -mirror *
-          R *
-          (1 - Math.cos(ang)) *
-          cfg.curve;
+      const current =
+        posRef.current;
 
-        rot =
-          (mirror * ang * 180) /
-          Math.PI;
+      let next =
+        current +
+        (target - current) *
+          k;
+
+      const settled =
+        Math.abs(
+          target - next,
+        ) < 0.001;
+
+      if (settled) {
+        next = target;
       }
 
-      el.style.transform =
-        `translate(${x.toFixed(2)}px, calc(${y.toFixed(
-          2
-        )}px - 50%)) rotate(${rot.toFixed(
-          3
-        )}deg)`;
+      posRef.current = next;
 
-      el.style.opacity = String(
-        Math.max(
-          cfg.minOpacity,
-          1 - dist * cfg.fade
-        )
-      );
+      const elements =
+        itemRefs.current;
 
-      el.style.filter =
-        cfg.blur > 0
-          ? `blur(${(
-              dist * cfg.blur
-            ).toFixed(2)}px)`
-          : "none";
+      const count =
+        cfg.count;
 
-      el.style.setProperty(
-        "--ow-p",
-        Math.max(
-          0,
-          1 - Math.min(dist, 1)
-        ).toFixed(4)
-      );
-    }
+      const mirror =
+        cfg.side === "right"
+          ? -1
+          : 1;
 
-    rafRef.current = settled
-      ? null
-      : requestAnimationFrame(runFrame);
-  }, []);
+      const tiltRad =
+        (cfg.tilt *
+          Math.PI) /
+        180;
 
-  const startLoop = useCallback(() => {
-    if (rafRef.current != null) {
-      cancelAnimationFrame(
-        rafRef.current
-      );
-    }
+      const radius =
+        tiltRad > 0.0005
+          ? cfg.rowH / tiltRad
+          : 0;
 
-    lastRef.current =
-      performance.now();
+      for (
+        let i = 0;
+        i < count;
+        i++
+      ) {
+        const el =
+          elements[i];
 
-    rafRef.current =
-      requestAnimationFrame(runFrame);
-  }, [runFrame]);
+        if (!el) continue;
 
-  const playTick = useCallback(() => {
-    const {
-      soundUrl,
-      soundVolume,
-    } = cfgRef.current;
+        let d =
+          i - next;
 
-    if (!soundUrl) return;
+        if (
+          cfg.loop &&
+          count > 1
+        ) {
+          d =
+            ((d % count) +
+              count) %
+            count;
 
-    const now = performance.now();
+          if (
+            d >
+            count / 2
+          ) {
+            d -= count;
+          }
+        }
 
-    if (
-      now - lastTickRef.current <
-      70
-    ) {
+        const distance =
+          Math.abs(d);
+
+        let x = 0;
+        let y =
+          d * cfg.rowH;
+        let rotation = 0;
+
+        if (radius > 0) {
+          const angle =
+            Math.max(
+              -Math.PI / 2,
+              Math.min(
+                Math.PI / 2,
+                d * tiltRad,
+              ),
+            );
+
+          y =
+            radius *
+            Math.sin(angle);
+
+          x =
+            -mirror *
+            radius *
+            (1 -
+              Math.cos(
+                angle,
+              )) *
+            cfg.curve;
+
+          rotation =
+            (mirror *
+              angle *
+              180) /
+            Math.PI;
+        }
+
+        /*
+         * POSITION
+         */
+
+        el.style.transform =
+          `translate(${x.toFixed(
+            2,
+          )}px, calc(${y.toFixed(
+            2,
+          )}px - 50%)) rotate(${rotation.toFixed(
+            3,
+          )}deg)`;
+
+        /*
+         * OPACITY
+         */
+
+        const opacity =
+          Math.max(
+            cfg.minOpacity,
+            1 -
+              distance *
+                cfg.fade,
+          );
+
+        el.style.opacity =
+          String(opacity);
+
+        /*
+         * BLUR
+         */
+
+        el.style.filter =
+          cfg.blur > 0
+            ? `blur(${(
+                distance *
+                cfg.blur
+              ).toFixed(
+                2,
+              )}px)`
+            : "none";
+
+        /*
+         * POSITION PROGRESS
+         */
+
+        el.style.setProperty(
+          "--ow-p",
+          Math.max(
+            0,
+            1 -
+              Math.min(
+                distance,
+                1,
+              ),
+          ).toFixed(4),
+        );
+      }
+
+      rafRef.current =
+        settled
+          ? null
+          : requestAnimationFrame(
+              runFrame,
+            );
+    },
+    [],
+  );
+
+  const startLoop =
+    useCallback(() => {
+      if (
+        rafRef.current !==
+        null
+      ) {
+        cancelAnimationFrame(
+          rafRef.current,
+        );
+      }
+
+      lastRef.current =
+        performance.now();
+
+      rafRef.current =
+        requestAnimationFrame(
+          runFrame,
+        );
+    }, [runFrame]);
+
+  /*
+   * ========================================
+   * OPTIONAL TICK SOUND
+   * ========================================
+   */
+
+  const playTick =
+    useCallback(() => {
+      const {
+        soundUrl,
+        soundVolume,
+      } = cfgRef.current;
+
+      if (!soundUrl) {
+        return;
+      }
+
+      const now =
+        performance.now();
+
+      if (
+        now -
+          lastTickRef.current <
+        70
+      ) {
+        return;
+      }
+
+      lastTickRef.current =
+        now;
+
+      if (
+        !audioRef.current ||
+        audioUrlRef.current !==
+          soundUrl
+      ) {
+        audioRef.current =
+          new Audio(
+            soundUrl,
+          );
+
+        audioRef.current.preload =
+          "auto";
+
+        audioUrlRef.current =
+          soundUrl;
+      }
+
+      const audio =
+        audioRef.current;
+
+      audio.volume =
+        Math.min(
+          Math.max(
+            soundVolume,
+            0,
+          ),
+          1,
+        );
+
+      audio.currentTime = 0;
+
+      audio
+        .play()
+        ?.catch(() => {});
+    }, []);
+
+  /*
+   * ========================================
+   * CHANGE TARGET
+   * ========================================
+   */
+
+  const applyTarget =
+    useCallback(
+      (value, snap) => {
+        const cfg =
+          cfgRef.current;
+
+        if (!cfg.count) {
+          return;
+        }
+
+        let nextValue =
+          value;
+
+        if (!cfg.loop) {
+          nextValue =
+            Math.min(
+              Math.max(
+                nextValue,
+                0,
+              ),
+              Math.max(
+                cfg.count - 1,
+                0,
+              ),
+            );
+        }
+
+        if (snap) {
+          nextValue =
+            Math.round(
+              nextValue,
+            );
+        }
+
+        targetRef.current =
+          nextValue;
+
+        const index =
+          ((Math.round(
+            nextValue,
+          ) %
+            cfg.count) +
+            cfg.count) %
+          cfg.count;
+
+        if (
+          index !==
+          selectedRef.current
+        ) {
+          selectedRef.current =
+            index;
+
+          setSelectedIndex(
+            index,
+          );
+
+          onChangeRef.current?.(
+            index,
+            cfg.items[index],
+          );
+
+          playTick();
+        }
+
+        startLoop();
+      },
+      [
+        playTick,
+        startLoop,
+      ],
+    );
+
+  /*
+   * ========================================
+   * WHEEL
+   * ========================================
+   */
+
+  useEffect(() => {
+    const element =
+      rootRef.current;
+
+    if (!element) {
       return;
     }
 
-    lastTickRef.current = now;
+    const handleWheel =
+      (event) => {
+        event.preventDefault();
 
-    if (
-      !audioRef.current ||
-      audioUrlRef.current !== soundUrl
-    ) {
-      audioRef.current =
-        new Audio(soundUrl);
+        if (
+          wheelLockRef.current
+        ) {
+          return;
+        }
 
-      audioRef.current.preload =
-        "auto";
+        const delta =
+          event.deltaMode ===
+          1
+            ? event.deltaY *
+              24
+            : event.deltaY;
 
-      audioUrlRef.current =
-        soundUrl;
-    }
+        if (
+          Math.abs(delta) <
+          8
+        ) {
+          return;
+        }
 
-    const audio = audioRef.current;
+        wheelLockRef.current =
+          true;
 
-    audio.volume = Math.min(
-      Math.max(soundVolume, 0),
-      1
-    );
+        const direction =
+          delta > 0
+            ? 1
+            : -1;
 
-    audio.currentTime = 0;
-
-    audio.play()?.catch(() => {});
-  }, []);
-
-  const applyTarget = useCallback(
-    (value, snap) => {
-      const cfg = cfgRef.current;
-
-      if (!cfg.count) return;
-
-      let v = value;
-
-      if (!cfg.loop) {
-        v = Math.min(
-          Math.max(v, 0),
-          Math.max(
-            cfg.count - 1,
-            0
-          )
-        );
-      }
-
-      if (snap) {
-        v = Math.round(v);
-      }
-
-      targetRef.current = v;
-
-      const idx =
-        ((Math.round(v) % cfg.count) +
-          cfg.count) %
-        cfg.count;
-
-      if (
-        idx !== selectedRef.current
-      ) {
-        selectedRef.current = idx;
-
-        setSelectedIndex(idx);
-
-        onChangeRef.current?.(
-          idx,
-          cfg.items[idx]
+        applyTarget(
+          Math.round(
+            targetRef.current,
+          ) + direction,
+          true,
         );
 
-        playTick();
-      }
+        window.setTimeout(
+          () => {
+            wheelLockRef.current =
+              false;
+          },
+          450,
+        );
+      };
 
-      startLoop();
-    },
-    [startLoop, playTick]
-  );
-
-  /*
-   * Wheel / trackpad
-   */
-  useEffect(() => {
-    const el = rootRef.current;
-
-    if (!el) return;
-
-    const onWheel = (e) => {
-  e.preventDefault();
-
-  if (wheelLockRef.current) {
-    return;
-  }
-
-  const delta =
-    e.deltaMode === 1
-      ? e.deltaY * 24
-      : e.deltaY;
-
-  if (Math.abs(delta) < 8) {
-    return;
-  }
-
-  wheelLockRef.current = true;
-
-  const direction =
-    delta > 0 ? 1 : -1;
-
-  applyTarget(
-    Math.round(targetRef.current) +
-      direction,
-    true
-  );
-
-  setTimeout(() => {
-    wheelLockRef.current = false;
-  }, 450);
-};
-
-    el.addEventListener(
+    element.addEventListener(
       "wheel",
-      onWheel,
-      { passive: false }
+      handleWheel,
+      {
+        passive: false,
+      },
     );
 
     return () => {
-      el.removeEventListener(
+      element.removeEventListener(
         "wheel",
-        onWheel
+        handleWheel,
       );
-
-      if (wheelTimerRef.current) {
-        clearTimeout(
-          wheelTimerRef.current
-        );
-      }
     };
   }, [applyTarget]);
 
   /*
-   * Drag
+   * ========================================
+   * DRAG
+   * ========================================
    */
+
   const handlePointerDown =
-    useCallback((e) => {
-      if (!cfgRef.current.draggable)
-        return;
+    useCallback(
+      (event) => {
+        if (
+          !cfgRef.current
+            .draggable
+        ) {
+          return;
+        }
 
-      dragRef.current = {
-        y: e.clientY,
-        start: targetRef.current,
-        id: e.pointerId,
-      };
+        dragRef.current = {
+          y: event.clientY,
+          start:
+            targetRef.current,
+          id: event.pointerId,
+        };
 
-      dragMovedRef.current = false;
+        dragMovedRef.current =
+          false;
 
-      setIsDragging(true);
-    }, []);
+        setIsDragging(true);
+      },
+      [],
+    );
 
   const handlePointerMove =
     useCallback(
-      (e) => {
+      (event) => {
         const drag =
           dragRef.current;
 
-        if (!drag) return;
+        if (!drag) {
+          return;
+        }
 
         const dy =
-          e.clientY - drag.y;
+          event.clientY -
+          drag.y;
 
         if (
           !dragMovedRef.current &&
           Math.abs(dy) > 4
         ) {
-          dragMovedRef.current = true;
+          dragMovedRef.current =
+            true;
 
           rootRef.current?.setPointerCapture(
-            drag.id
+            drag.id,
           );
         }
 
-        if (dragMovedRef.current) {
+        if (
+          dragMovedRef.current
+        ) {
           applyTarget(
             drag.start -
               dy /
                 cfgRef.current
                   .rowH,
-            false
+            false,
           );
         }
       },
-      [applyTarget]
+      [applyTarget],
     );
 
   const handlePointerEnd =
     useCallback(() => {
-      if (!dragRef.current)
+      if (!dragRef.current) {
         return;
+      }
 
       dragRef.current = null;
 
       setIsDragging(false);
 
-      if (dragMovedRef.current) {
+      if (
+        dragMovedRef.current
+      ) {
         applyTarget(
           targetRef.current,
-          true
+          true,
         );
       }
     }, [applyTarget]);
 
   /*
-   * Click item
+   * ========================================
+   * CLICK
+   * ========================================
    */
+
   const handleItemClick =
     useCallback(
       (index) => {
-        if (dragMovedRef.current)
+        if (
+          dragMovedRef.current
+        ) {
           return;
+        }
 
-        const cfg = cfgRef.current;
+        const cfg =
+          cfgRef.current;
 
-        const cur =
+        const current =
           targetRef.current;
 
-        let d =
+        let distance =
           index -
-          (((cur % cfg.count) +
+          (((current %
+            cfg.count) +
             cfg.count) %
             cfg.count);
 
@@ -473,69 +699,83 @@ const OptionWheel = ({
           cfg.count > 1
         ) {
           if (
-            d >
+            distance >
             cfg.count / 2
           ) {
-            d -= cfg.count;
+            distance -=
+              cfg.count;
           } else if (
-            d <
+            distance <
             -cfg.count / 2
           ) {
-            d += cfg.count;
+            distance +=
+              cfg.count;
           }
         }
 
         applyTarget(
-          cur + d,
-          true
+          current + distance,
+          true,
         );
       },
-      [applyTarget]
+      [applyTarget],
     );
 
   /*
-   * Keyboard
+   * ========================================
+   * KEYBOARD
+   * ========================================
    */
+
   const handleKeyDown =
     useCallback(
-      (e) => {
+      (event) => {
         let delta = null;
 
         if (
-          e.key === "ArrowUp" ||
-          e.key === "ArrowLeft"
+          event.key ===
+            "ArrowUp" ||
+          event.key ===
+            "ArrowLeft"
         ) {
           delta = -1;
         }
 
         if (
-          e.key === "ArrowDown" ||
-          e.key === "ArrowRight"
+          event.key ===
+            "ArrowDown" ||
+          event.key ===
+            "ArrowRight"
         ) {
           delta = 1;
         }
 
-        if (delta == null) return;
+        if (delta === null) {
+          return;
+        }
 
-        e.preventDefault();
+        event.preventDefault();
 
         applyTarget(
           Math.round(
-            targetRef.current
+            targetRef.current,
           ) + delta,
-          true
+          true,
         );
       },
-      [applyTarget]
+      [applyTarget],
     );
 
   /*
-   * Initial render
+   * ========================================
+   * SYNC
+   * ========================================
    */
+
   useEffect(() => {
     applyTarget(
       targetRef.current,
-      false
+      false,
     );
   }, [
     items,
@@ -553,19 +793,31 @@ const OptionWheel = ({
   ]);
 
   /*
-   * Cleanup
+   * ========================================
+   * CLEANUP
+   * ========================================
    */
+
   useEffect(() => {
     return () => {
-      if (rafRef.current != null) {
+      if (
+        rafRef.current !==
+        null
+      ) {
         cancelAnimationFrame(
-          rafRef.current
+          rafRef.current,
         );
       }
 
       audioRef.current?.pause();
     };
   }, []);
+
+  /*
+   * ========================================
+   * RENDER
+   * ========================================
+   */
 
   return (
     <div
@@ -578,23 +830,28 @@ const OptionWheel = ({
         h-full
         w-full
         select-none
-        overflow-hidden
+        overflow-visible
         outline-none
         [touch-action:none]
+
         ${
           isDragging
             ? "cursor-grabbing"
             : "cursor-grab"
         }
+
         ${className}
       `}
       style={{
         "--ow-text-color":
           textColor,
+
         "--ow-active-color":
           activeColor,
+
         "--ow-font-size":
           `${fontSize}rem`,
+
         "--ow-inset":
           `${inset}px`,
       }}
@@ -610,52 +867,87 @@ const OptionWheel = ({
       onPointerCancel={
         handlePointerEnd
       }
-      onKeyDown={handleKeyDown}
+      onKeyDown={
+        handleKeyDown
+      }
     >
       {items.map(
-        (label, index) => (
-          <div
-            key={`${label}-${index}`}
-            ref={(el) => {
-              itemRefs.current[
-                index
-              ] = el;
-            }}
-            role="option"
-            aria-selected={
-              selectedIndex ===
-              index
-            }
-            className={`
-              absolute
-              top-1/2
-              cursor-pointer
-              whitespace-nowrap
-              leading-none
-              will-change-[transform,opacity,filter]
-              [font-size:var(--ow-font-size)]
-              [color:color-mix(in_srgb,var(--ow-active-color)_calc(var(--ow-p,0)*100%),var(--ow-text-color))]
-              ${
-                side === "right"
-                  ? "right-[var(--ow-inset)] origin-right"
-                  : "left-[var(--ow-inset)] origin-left"
+        (label, index) => {
+          const isSelected =
+            selectedIndex ===
+            index;
+
+          return (
+            <div
+              key={`${label}-${index}`}
+              ref={(element) => {
+                itemRefs.current[
+                  index
+                ] = element;
+              }}
+              role="option"
+              aria-selected={
+                isSelected
               }
-              ${
-                selectedIndex ===
-                index
-                  ? "font-semibold"
-                  : "font-normal"
+              className="
+                absolute
+                top-1/2
+                whitespace-nowrap
+                leading-none
+                will-change-[transform,opacity,filter]
+              "
+              style={{
+                fontSize:
+                  `${fontSize}rem`,
+
+                color:
+                  isSelected
+                    ? activeColor
+                    : textColor,
+
+                fontWeight:
+                  isSelected
+                    ? 600
+                    : 400,
+
+                left:
+                  side ===
+                  "left"
+                    ? `${inset}px`
+                    : undefined,
+
+                right:
+                  side ===
+                  "right"
+                    ? `${inset}px`
+                    : undefined,
+
+                transformOrigin:
+                  side ===
+                  "right"
+                    ? "right center"
+                    : "left center",
+
+                textShadow:
+                  isSelected
+                    ? "0 1px 14px rgba(0,0,0,.45)"
+                    : "0 1px 8px rgba(0,0,0,.35)",
+
+                zIndex:
+                  isSelected
+                    ? 10
+                    : 1,
+              }}
+              onClick={() =>
+                handleItemClick(
+                  index,
+                )
               }
-            `}
-            onClick={() =>
-              handleItemClick(
-                index
-              )
-            }
-          >
-            {label}
-          </div>
-        )
+            >
+              {label}
+            </div>
+          );
+        },
       )}
     </div>
   );
