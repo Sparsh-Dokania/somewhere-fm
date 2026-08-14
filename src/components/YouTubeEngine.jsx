@@ -1,33 +1,58 @@
 // src/components/YouTubeEngine.jsx
 
-import { useEffect, useRef } from "react";
+import {
+  useEffect,
+  useRef,
+} from "react";
 
 let youtubePromise = null;
 
 function loadYouTubeAPI() {
-  if (window.YT?.Player) {
-    return Promise.resolve(window.YT);
+  if (
+    typeof window !== "undefined" &&
+    window.YT?.Player
+  ) {
+    return Promise.resolve(
+      window.YT,
+    );
   }
 
   if (youtubePromise) {
     return youtubePromise;
   }
 
-  youtubePromise = new Promise((resolve) => {
-    window.onYouTubeIframeAPIReady = () => {
-      resolve(window.YT);
-    };
+  youtubePromise =
+    new Promise((resolve) => {
+      const existingScript =
+        document.querySelector(
+          'script[src="https://www.youtube.com/iframe_api"]',
+        );
 
-    const script =
-      document.createElement("script");
+      window.onYouTubeIframeAPIReady =
+        () => {
+          resolve(
+            window.YT,
+          );
+        };
 
-    script.src =
-      "https://www.youtube.com/iframe_api";
+      if (existingScript) {
+        return;
+      }
 
-    script.async = true;
+      const script =
+        document.createElement(
+          "script",
+        );
 
-    document.head.appendChild(script);
-  });
+      script.src =
+        "https://www.youtube.com/iframe_api";
+
+      script.async = true;
+
+      document.head.appendChild(
+        script,
+      );
+    });
 
   return youtubePromise;
 }
@@ -37,18 +62,27 @@ function YouTubeEngine({
   playerRef,
   onReady,
 }) {
-  const containerRef = useRef(null);
-  const initializedRef = useRef(false);
+  const containerRef =
+    useRef(null);
+
+  const initializedRef =
+    useRef(false);
+
+  const readyRef =
+    useRef(false);
 
   /*
+   * ========================================
    * CREATE PLAYER ONCE
+   * ========================================
    */
 
   useEffect(() => {
     let cancelled = false;
 
-    async function initialize() {
-      const YT = await loadYouTubeAPI();
+    const initialize = async () => {
+      const YT =
+        await loadYouTubeAPI();
 
       if (
         cancelled ||
@@ -77,60 +111,87 @@ function YouTubeEngine({
 
           events: {
             onReady: (event) => {
+              if (cancelled) {
+                return;
+              }
+
               playerRef.current =
                 event.target;
+
+              readyRef.current =
+                true;
 
               onReady?.(event);
             },
           },
-        }
+        },
       );
-    }
+    };
 
     initialize();
 
     return () => {
       cancelled = true;
     };
-  }, []);
+  }, [onReady, playerRef]);
 
   /*
-   * LOAD NEW PLAYLIST
+   * ========================================
+   * LOAD PLAYLIST
+   * ========================================
    */
 
   useEffect(() => {
-  const player = playerRef.current;
+    const player =
+      playerRef.current;
 
-  if (
-    !player ||
-    !playlistId ||
-    typeof player.loadPlaylist !== "function"
-  ) {
-    return;
-  }
+    if (
+      !readyRef.current ||
+      !player ||
+      !playlistId
+    ) {
+      return;
+    }
 
-  player.loadPlaylist({
-    listType: "playlist",
-    list: playlistId,
-    index: 0,
-  });
+    if (
+      typeof player.loadPlaylist !==
+      "function"
+    ) {
+      return;
+    }
 
-  player.pauseVideo();
-}, [playlistId, onReady]);
+    try {
+      player.loadPlaylist({
+        listType: "playlist",
+        list: playlistId,
+        index: 0,
+      });
+
+      player.pauseVideo?.();
+    } catch (error) {
+      console.error(
+        "SOMEWHERE.FM playlist load failed:",
+        error,
+      );
+    }
+  }, [
+    playlistId,
+    playerRef,
+  ]);
 
   return (
     <div
       ref={containerRef}
+      aria-hidden="true"
       className="
         pointer-events-none
         fixed
-        -left-[1000px]
-        top-0
+        left-[-10000px]
+        top-[-10000px]
         h-[200px]
         w-[200px]
         opacity-0
       "
-      aria-hidden="true"
     />
   );
 }

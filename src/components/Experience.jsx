@@ -640,6 +640,7 @@ function Experience({
             pointer-events-auto
             w-full
             max-w-[570px]
+            
           "
         >
           <Player

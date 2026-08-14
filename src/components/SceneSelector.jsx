@@ -27,16 +27,16 @@ function SceneSelector({
         pointer-events-auto
         absolute
         left-4
-        bottom-[calc(118px+env(safe-area-inset-bottom))]
+        bottom-[calc(136px+env(safe-area-inset-bottom))]
         z-[100]
 
-        h-[168px]
-        w-[240px]
+        h-[182px]
+        w-[268px]
         max-w-[calc(100vw-32px)]
 
-        sm:bottom-[calc(120px+env(safe-area-inset-bottom))]
-        sm:h-[176px]
-        sm:w-[256px]
+        sm:bottom-[calc(126px+env(safe-area-inset-bottom))]
+        sm:h-[184px]
+        sm:w-[276px]
 
         md:bottom-7
         md:left-2
@@ -53,8 +53,8 @@ function SceneSelector({
         activeColor="#ffffff"
         side="left"
 
-        fontSize={1.05}
-        spacing={1.6}
+        fontSize={1.12}
+        spacing={1.72}
 
         curve={1.05}
         tilt={6}
@@ -64,7 +64,7 @@ function SceneSelector({
         minOpacity={0.08}
 
         smoothing={220}
-        inset={20}
+        inset={22}
 
         loop={false}
         draggable={true}

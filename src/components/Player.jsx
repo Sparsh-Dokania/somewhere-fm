@@ -465,9 +465,9 @@ function Player({
         className="
           w-full
           overflow-hidden
-          rounded-[22px]
-          px-3
-          py-3
+          rounded-[24px]
+          px-3.5
+          py-3.5
 
           sm:rounded-[24px]
           sm:px-3.5
@@ -483,9 +483,9 @@ function Player({
             flex
             min-w-0
             items-center
-            gap-2.5
+            gap-3
 
-            sm:gap-3
+            sm:gap-3.5
 
             md:gap-3
           "
@@ -498,8 +498,8 @@ function Player({
             ref={cdRef}
             className="
               relative
-              h-14
-              w-14
+              h-[68px]
+              w-[68px]
               shrink-0
               overflow-hidden
               rounded-full
@@ -507,8 +507,8 @@ function Player({
               border-white/20
               shadow-xl
 
-              sm:h-15
-              sm:w-15
+              sm:h-[72px]
+              sm:w-[72px]
 
               md:h-16
               md:w-16
@@ -659,12 +659,12 @@ function Player({
             <p
               className="
                 truncate
-                text-[13px]
+                text-[14px]
                 font-medium
                 leading-tight
                 text-white
 
-                sm:text-[14px]
+                sm:text-[15px]
 
                 md:text-[13px]
               "
@@ -676,11 +676,11 @@ function Player({
               className="
                 mt-0.5
                 truncate
-                text-[10px]
+                text-[11px]
                 leading-tight
                 text-white/50
 
-                sm:text-[11px]
+                sm:text-[12px]
 
                 md:text-[11px]
               "
@@ -690,18 +690,18 @@ function Player({
 
             <div
               className="
-                mt-2.5
+                mt-3
                 flex
                 items-center
-                gap-1.5
+                gap-2
 
-                sm:mt-3
-                sm:gap-2
+                sm:mt-3.5
+                sm:gap-2.5
               "
             >
               <div
                 className="
-                  h-[2px]
+                  h-[3px]
                   min-w-0
                   flex-1
                   overflow-hidden
@@ -731,10 +731,10 @@ function Player({
                 className="
                   shrink-0
                   font-mono
-                  text-[8px]
+                  text-[9px]
                   text-white/40
 
-                  sm:text-[9px]
+                  sm:text-[10px]
                 "
               >
                 {formatTime(
@@ -753,9 +753,9 @@ function Player({
               flex
               shrink-0
               items-center
-              gap-0.5
+              gap-1
 
-              sm:gap-1
+              sm:gap-1.5
 
               md:gap-1
             "
@@ -769,8 +769,8 @@ function Player({
               aria-label="Previous track"
               className="
                 flex
-                h-10
-                w-10
+                h-11
+                w-11
                 shrink-0
                 items-center
                 justify-center
@@ -778,8 +778,8 @@ function Player({
                 text-white/50
                 transition
 
-                sm:h-10
-                sm:w-10
+                sm:h-11
+                sm:w-11
 
                 md:h-9
                 md:w-9
@@ -807,8 +807,8 @@ function Player({
               }
               className="
                 flex
-                h-11
-                w-11
+                h-12
+                w-12
                 shrink-0
                 items-center
                 justify-center
@@ -819,8 +819,8 @@ function Player({
                 transition
                 duration-200
 
-                sm:h-12
-                sm:w-12
+                sm:h-[52px]
+                sm:w-[52px]
 
                 md:h-11
                 md:w-11
@@ -851,8 +851,8 @@ function Player({
               aria-label="Next track"
               className="
                 flex
-                h-10
-                w-10
+                h-11
+                w-11
                 shrink-0
                 items-center
                 justify-center
@@ -860,8 +860,8 @@ function Player({
                 text-white/50
                 transition
 
-                sm:h-10
-                sm:w-10
+                sm:h-11
+                sm:w-11
 
                 md:h-9
                 md:w-9
