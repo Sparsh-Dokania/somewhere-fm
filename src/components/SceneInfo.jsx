@@ -27,19 +27,21 @@ function SceneInfo({ scene }) {
     scene.quotes?.[quoteIndex];
 
   return (
-    <div
-    
-      className="
-        absolute
-        left-6
-        top-20
-        z-30
-        max-w-[calc(100%-48px)]
-        md:left-10
-        md:top-24
-        md:max-w-[680px]
-      "
-    >
+   <div
+  className="
+    absolute
+    left-5
+    top-16
+    z-30
+    max-w-[calc(100%-40px)]
+
+    sm:left-7
+    sm:top-20
+
+    md:left-8
+    md:top-24
+  "
+>
       {/* LOCATION / META */}
 
       <div
@@ -66,37 +68,42 @@ function SceneInfo({ scene }) {
 
       {/* TITLE */}
 
-     <h1
+    <h1
   className="
-    max-w-[680px]
-    font-['Noto_Serif_Devanagari']
-    text-[clamp(2.5rem,6vw,5.8rem)]
-    font-semibold
-    leading-[1.02]
-    tracking-[-0.04em]
-    text-white
-    drop-shadow-[0_4px_24px_rgba(0,0,0,0.3)]
+    max-w-[340px]
+    text-[30px]
+    font-bold
+    leading-[0.95]
+    tracking-[-0.03em]
+
+    sm:text-[38px]
+
+    md:max-w-[600px]
+    md:text-[56px]
   "
 >
-        {scene.title}
-      </h1>
-
+  {scene.title}
+</h1>
       {/* DESCRIPTION */}
 
       <p
-        className="
-          mt-4
-          max-w-[460px]
-          text-[13px]
-          font-medium
-          leading-relaxed
-          tracking-wide
-          text-white/60
-        "
-      >
-        {scene.description}
-      </p>
+  className="
+    mt-2
+    max-w-[280px]
+    text-[10px]
+    leading-relaxed
+    text-white/55
 
+    sm:max-w-[340px]
+    sm:text-[11px]
+
+    md:mt-3
+    md:max-w-[500px]
+    md:text-[13px]
+  "
+>
+  {scene.description}
+</p>
       {/* TRUCK QUOTE */}
 
       {currentQuote && (

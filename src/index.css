@@ -25,13 +25,16 @@ body,
   width: 100%;
   height: 100%;
   margin: 0;
+  padding: 0;
 }
 
 body {
   overflow: hidden;
   background: #000;
 }
-
+#root{
+  min-height: 100dvh;
+}
 button {
   border: 0;
   outline: 0;

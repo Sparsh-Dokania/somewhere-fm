@@ -9,12 +9,7 @@ import SceneSelector from "./SceneSelector";
 import YouTubeEngine from "./YouTubeEngine";
 import { scenes } from "../data/scenes";
 
-function Experience({
-  scene,
-  sceneIndex,
-  totalScenes,
-  onChangeScene,
-}) {
+function Experience({ scene, sceneIndex, totalScenes, onChangeScene }) {
   const backgroundRef = useRef(null);
   const contentRef = useRef(null);
   const infoRef = useRef(null);
@@ -32,10 +27,7 @@ function Experience({
    */
 
   const changeScene = (nextIndex) => {
-    if (
-      transitionRef.current ||
-      nextIndex === sceneIndex
-    ) {
+    if (transitionRef.current || nextIndex === sceneIndex) {
       return;
     }
 
@@ -57,7 +49,7 @@ function Experience({
         duration: 0.35,
         ease: "power2.inOut",
       },
-      0
+      0,
     );
 
     // Scene information gently moves
@@ -69,7 +61,7 @@ function Experience({
         duration: 0.22,
         ease: "power2.in",
       },
-      0
+      0,
     );
 
     // Player barely moves
@@ -81,7 +73,7 @@ function Experience({
         duration: 0.25,
         ease: "power2.inOut",
       },
-      0
+      0,
     );
 
     // Change actual scene
@@ -90,16 +82,13 @@ function Experience({
     });
 
     // New background settles
-    tl.to(
-      backgroundRef.current,
-      {
-        scale: 1,
-        xPercent: 0,
-        filter: "blur(0px)",
-        duration: 0.7,
-        ease: "power3.out",
-      }
-    );
+    tl.to(backgroundRef.current, {
+      scale: 1,
+      xPercent: 0,
+      filter: "blur(0px)",
+      duration: 0.7,
+      ease: "power3.out",
+    });
 
     // New information arrives
     tl.fromTo(
@@ -114,7 +103,7 @@ function Experience({
         duration: 0.5,
         ease: "power3.out",
       },
-      "-=0.55"
+      "-=0.55",
     );
 
     // Player settles
@@ -126,7 +115,7 @@ function Experience({
         duration: 0.45,
         ease: "power3.out",
       },
-      "-=0.45"
+      "-=0.45",
     );
   };
 
@@ -137,19 +126,13 @@ function Experience({
    */
 
   const previousScene = () => {
-    const index =
-      sceneIndex === 0
-        ? totalScenes - 1
-        : sceneIndex - 1;
+    const index = sceneIndex === 0 ? totalScenes - 1 : sceneIndex - 1;
 
     changeScene(index);
   };
 
   const nextScene = () => {
-    const index =
-      sceneIndex === totalScenes - 1
-        ? 0
-        : sceneIndex + 1;
+    const index = sceneIndex === totalScenes - 1 ? 0 : sceneIndex + 1;
 
     changeScene(index);
   };
@@ -169,31 +152,19 @@ function Experience({
         return;
       }
 
-      if (
-        event.key === "ArrowRight" ||
-        event.key === "ArrowDown"
-      ) {
+      if (event.key === "ArrowRight" || event.key === "ArrowDown") {
         nextScene();
       }
 
-      if (
-        event.key === "ArrowLeft" ||
-        event.key === "ArrowUp"
-      ) {
+      if (event.key === "ArrowLeft" || event.key === "ArrowUp") {
         previousScene();
       }
     };
 
-    window.addEventListener(
-      "keydown",
-      handleKeyDown
-    );
+    window.addEventListener("keydown", handleKeyDown);
 
     return () => {
-      window.removeEventListener(
-        "keydown",
-        handleKeyDown
-      );
+      window.removeEventListener("keydown", handleKeyDown);
     };
   });
 
@@ -203,7 +174,6 @@ function Experience({
    * ----------------------------------------
    */
 
-  
   /*
    * ----------------------------------------
    * YOUTUBE READY
@@ -212,8 +182,7 @@ function Experience({
 
   const handleYouTubeReady = (event) => {
     if (event?.target) {
-      youtubePlayer.current =
-        event.target;
+      youtubePlayer.current = event.target;
     }
 
     setYoutubeReady(true);
@@ -222,15 +191,15 @@ function Experience({
   return (
     <section
       className="
-        relative
-        h-full
-        w-full
-        overflow-hidden
-        bg-black
-        text-white
-      "
+    fixed
+    inset-0
+    h-[100dvh]
+    w-screen
+    overflow-hidden
+    bg-black
+    text-white
+  "
     >
-
       {/* BACKGROUND */}
 
       <div
@@ -242,23 +211,21 @@ function Experience({
         "
       >
         <picture>
-          <source
-            media="(max-width: 768px)"
-            srcSet={scene.mobileImage}
-          />
+          <source media="(max-width: 768px)" srcSet={scene.mobileImage} />
 
           <img
             src={scene.desktopImage}
             alt=""
             className="
-              h-full
-              w-full
-              object-cover
-            "
+    h-full
+    w-full
+    object-cover
+    object-center
+    md:object-center
+  "
           />
         </picture>
       </div>
-
 
       {/* ATMOSPHERE */}
 
@@ -281,7 +248,6 @@ function Experience({
         "
       />
 
-
       {/* CONTENT */}
 
       <div
@@ -293,13 +259,11 @@ function Experience({
           w-full
         "
       >
-
         {/* SCENE INFO */}
 
         <div ref={infoRef}>
           <SceneInfo scene={scene} />
         </div>
-
 
         {/* PLAYER */}
 
@@ -320,17 +284,15 @@ function Experience({
           </div>
         </div>
 
-
         {/* SCENE SELECTOR */}
 
-       <SceneSelector
-  sceneIndex={sceneIndex}
-  totalScenes={totalScenes}
-  scenes={scenes}
-  onChangeScene={changeScene}
-/>
+        <SceneSelector
+          sceneIndex={sceneIndex}
+          totalScenes={totalScenes}
+          scenes={scenes}
+          onChangeScene={changeScene}
+        />
       </div>
-
 
       {/* BRAND */}
 
@@ -357,17 +319,13 @@ function Experience({
         </p>
       </div>
 
-
       {/* YOUTUBE ENGINE */}
 
       <YouTubeEngine
-        playlistId={
-          scene.playlist?.playlistId
-        }
+        playlistId={scene.playlist?.playlistId}
         playerRef={youtubePlayer}
         onReady={handleYouTubeReady}
       />
-
     </section>
   );
 }
