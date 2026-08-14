@@ -465,13 +465,13 @@ function Player({
         className="
           w-full
           overflow-hidden
-          rounded-[20px]
-          px-2.5
-          py-2.5
+          rounded-[22px]
+          px-3
+          py-3
 
-          sm:rounded-[22px]
-          sm:px-3
-          sm:py-2.5
+          sm:rounded-[24px]
+          sm:px-3.5
+          sm:py-3
 
           md:rounded-[25px]
           md:px-4
@@ -483,9 +483,9 @@ function Player({
             flex
             min-w-0
             items-center
-            gap-2
+            gap-2.5
 
-            sm:gap-2.5
+            sm:gap-3
 
             md:gap-3
           "
@@ -498,8 +498,8 @@ function Player({
             ref={cdRef}
             className="
               relative
-              h-12
-              w-12
+              h-14
+              w-14
               shrink-0
               overflow-hidden
               rounded-full
@@ -507,8 +507,8 @@ function Player({
               border-white/20
               shadow-xl
 
-              sm:h-14
-              sm:w-14
+              sm:h-15
+              sm:w-15
 
               md:h-16
               md:w-16
@@ -659,12 +659,12 @@ function Player({
             <p
               className="
                 truncate
-                text-[11px]
+                text-[13px]
                 font-medium
                 leading-tight
                 text-white
 
-                sm:text-[12px]
+                sm:text-[14px]
 
                 md:text-[13px]
               "
@@ -676,11 +676,11 @@ function Player({
               className="
                 mt-0.5
                 truncate
-                text-[9px]
+                text-[10px]
                 leading-tight
                 text-white/50
 
-                sm:text-[10px]
+                sm:text-[11px]
 
                 md:text-[11px]
               "
@@ -690,12 +690,12 @@ function Player({
 
             <div
               className="
-                mt-2
+                mt-2.5
                 flex
                 items-center
                 gap-1.5
 
-                sm:mt-2.5
+                sm:mt-3
                 sm:gap-2
               "
             >
@@ -753,9 +753,9 @@ function Player({
               flex
               shrink-0
               items-center
-              gap-0
+              gap-0.5
 
-              sm:gap-0.5
+              sm:gap-1
 
               md:gap-1
             "
@@ -769,8 +769,8 @@ function Player({
               aria-label="Previous track"
               className="
                 flex
-                h-9
-                w-9
+                h-10
+                w-10
                 shrink-0
                 items-center
                 justify-center
@@ -778,8 +778,8 @@ function Player({
                 text-white/50
                 transition
 
-                sm:h-9
-                sm:w-9
+                sm:h-10
+                sm:w-10
 
                 md:h-9
                 md:w-9
@@ -807,8 +807,8 @@ function Player({
               }
               className="
                 flex
-                h-10
-                w-10
+                h-11
+                w-11
                 shrink-0
                 items-center
                 justify-center
@@ -819,8 +819,8 @@ function Player({
                 transition
                 duration-200
 
-                sm:h-11
-                sm:w-11
+                sm:h-12
+                sm:w-12
 
                 md:h-11
                 md:w-11
@@ -851,8 +851,8 @@ function Player({
               aria-label="Next track"
               className="
                 flex
-                h-9
-                w-9
+                h-10
+                w-10
                 shrink-0
                 items-center
                 justify-center
@@ -860,8 +860,8 @@ function Player({
                 text-white/50
                 transition
 
-                sm:h-9
-                sm:w-9
+                sm:h-10
+                sm:w-10
 
                 md:h-9
                 md:w-9

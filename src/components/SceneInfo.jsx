@@ -30,31 +30,33 @@ function SceneInfo({ scene }) {
    <div
   className="
     absolute
-    left-5
-    top-16
+    left-4
+    top-[calc(18px+env(safe-area-inset-top))]
     z-30
-    max-w-[calc(100%-40px)]
+    max-w-[calc(100vw-32px)]
 
-    sm:left-7
-    sm:top-20
+    sm:left-6
+    sm:top-[calc(24px+env(safe-area-inset-top))]
 
     md:left-8
-    md:top-24
+    md:top-[calc(28px+env(safe-area-inset-top))]
   "
 >
       {/* LOCATION / META */}
 
       <div
         className="
-          mb-5
+          mb-4
           flex
           items-center
           gap-2
           font-mono
-          text-[8px]
+          text-[9px]
           uppercase
           tracking-[0.2em]
           text-white/60
+
+          sm:text-[10px]
         "
       >
         <span>{scene.location}</span>
@@ -70,13 +72,13 @@ function SceneInfo({ scene }) {
 
     <h1
   className="
-    max-w-[340px]
-    text-[30px]
+    max-w-[min(520px,calc(100vw-32px))]
+    text-[clamp(38px,11.5vw,48px)]
     font-bold
     leading-[0.95]
     tracking-[-0.03em]
 
-    sm:text-[38px]
+    sm:text-[46px]
 
     md:max-w-[600px]
     md:text-[56px]
@@ -89,13 +91,13 @@ function SceneInfo({ scene }) {
       <p
   className="
     mt-2
-    max-w-[280px]
-    text-[10px]
+    max-w-[min(360px,calc(100vw-32px))]
+    text-[clamp(11px,2.8vw,13px)]
     leading-relaxed
     text-white/55
 
-    sm:max-w-[340px]
-    sm:text-[11px]
+    sm:max-w-[380px]
+    sm:text-[12px]
 
     md:mt-3
     md:max-w-[500px]

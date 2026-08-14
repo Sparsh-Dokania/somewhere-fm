@@ -6,7 +6,7 @@ function App() {
   const [activeScene, setActiveScene] = useState(0);
 
   return (
-    <main className="h-screen w-full overflow-hidden bg-black">
+    <main className="min-h-[100dvh] w-full overflow-hidden bg-black">
       <Experience
         scene={scenes[activeScene]}
         sceneIndex={activeScene}
