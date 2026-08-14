@@ -762,7 +762,7 @@ md:w-1.5
   disabled:cursor-not-allowed
   disabled:opacity-30
 "
-              "
+              
             >
               <SkipForward size={14} />
             </button>
